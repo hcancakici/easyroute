@@ -80,7 +80,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'easyroute',
         'USER': 'postgres',
-        'PASSWORD': 'Easy123!@#',
+        'PASSWORD': 'examplepassword',
         'HOST': 'localhost',
     }
 }

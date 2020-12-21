@@ -1,3 +1,13 @@
+<style>
+    html, body {
+      height: 100%;
+    }
+
+    .full-height {
+      height: 100%;
+    }
+</style>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -21,9 +31,7 @@
 </head>
 <body>
 
-
-
-<div id="mapid" style="width: 1200px; height: 1000px;"></div>
+<div id="mapid" class="full-height"></div>
 <script>
 
 	var map = L.map('mapid').setView([41, 34], 10);
@@ -32,41 +40,54 @@
 	    attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
 	}).addTo(map);
 
-	
-	var destinations = [];
+    const waypoints = []
+    let lat;
+    let long;
+	{% for q,v in locations.items %}
+        {% for a in v %}
+            lat = {{ a.latitude }};
+            long = {{ a.longitude }};
+            waypoints.push(L.latLng(lat, long))
+            L.marker([lat, long]).addTo(map);
+        {% endfor %}
+    {% endfor %}
+    L.polyline(waypoints).addTo(map)
+	const control = L.Routing.control({
+        waypoints: [
+            L.latLng(41.96, 35.14),
+            L.latLng(41.74, 33.94),
+        ],
+        routeWhileDragging: true,
+    }).addTo(map);
 
-	function savePath(title, path) {
-		$.ajax({
-		  url: "127.0.0.1/locations",
-		  type: "POST",
-		  data: {user: title, lat: pathlat, lng: lng},
-		}).done(function() {
-		  $( this ).addClass( "done" );
-		});
 
-	}
+	function createButton(label, container) {
+        var btn = L.DomUtil.create('button', '', container);
+        btn.setAttribute('type', 'button');
+        btn.innerHTML = label;
+        return btn;
+    }
 
-	function onMapClick(e) {
-		console.log(e);
-		destinations.push([e.latlng.lat, e.latlng.lng]);
-		if (destinations.length === 2) {
+    map.on('click', function(e) {
+        var container = L.DomUtil.create('div'),
+        startBtn = createButton('Start from this location', container),
+        destBtn = createButton('Go to this location', container);
 
-			let path = L.Routing.control({
-			    waypoints: [
-			        L.latLng(destinations[0][0], destinations[0][1]),
-			        L.latLng(destinations[1][0], destinations[1][1])
-			    ]
-			})
-			let title;
-			title = prompt("Path title: ");
-			console.log(path)
-			savePath(title, path)
-			path.addTo(map);
-			destinations = [];
-		}
-	}
-	map.on('click', onMapClick);
+        L.popup()
+            .setContent(container)
+            .setLatLng(e.latlng)
+            .openOn(map);
 
+        L.DomEvent.on(startBtn, 'click', function() {
+            control.spliceWaypoints(0, 1, e.latlng);
+            map.closePopup();
+        });
+
+         L.DomEvent.on(destBtn, 'click', function() {
+            control.spliceWaypoints(control.getWaypoints().length - 1, 1, e.latlng);
+            map.closePopup();
+        });
+    });
 </script>
 
 
