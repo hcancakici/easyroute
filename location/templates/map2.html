@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+	
+	<title>STALKER</title>
+
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	
+	<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" />
+	<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+	<script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"></script>
+	<script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+
+	
+</head>
+<body>
+
+
+
+<div id="mapid" style="width: 1200px; height: 1000px;"></div>
+<script>
+
+	var map = L.map('mapid').setView([41, 34], 10);
+
+	L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+	    attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+	}).addTo(map);
+
+	
+	var destinations = [];
+
+	function savePath(title, path) {
+		$.ajax({
+		  url: "127.0.0.1/locations",
+		  type: "POST",
+		  data: {user: title, lat: pathlat, lng: lng},
+		}).done(function() {
+		  $( this ).addClass( "done" );
+		});
+
+	}
+
+	function onMapClick(e) {
+		console.log(e);
+		destinations.push([e.latlng.lat, e.latlng.lng]);
+		if (destinations.length === 2) {
+
+			let path = L.Routing.control({
+			    waypoints: [
+			        L.latLng(destinations[0][0], destinations[0][1]),
+			        L.latLng(destinations[1][0], destinations[1][1])
+			    ]
+			})
+			let title;
+			title = prompt("Path title: ");
+			console.log(path)
+			savePath(title, path)
+			path.addTo(map);
+			destinations = [];
+		}
+	}
+	map.on('click', onMapClick);
+
+</script>
+
+
+
+</body>
+</html>
