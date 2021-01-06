@@ -1,3 +1,8 @@
+import datetime
+
+from django.contrib.gis.geos import Point
+from django.contrib.gis.measure import Distance, D
+
 from rest_framework import viewsets, generics
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
@@ -18,25 +23,44 @@ class LocationViewSet(viewsets.ModelViewSet):
     ordering_fields = '__all__'
 
 
-class MapViewSet(generics.RetrieveAPIView):
-    queryset = Location.objects.all()
+class MapViewSet(generics.ListAPIView):
     serializer_class = LocationSerializer
     template_name = "map2.html"
     renderer_classes = [TemplateHTMLRenderer]
     http_method_names = ['get', 'post']
 
+    def get_queryset(self):
+        user_id = self.request.query_params.get('user_id', 9)
+        queryset = Location.objects.filter(user_id=user_id)
+        queryset = Location.objects.all()
+        date = self.request.query_params.get('date', None)
+        radius = self.request.query_params.get('radius', 50000)  # KM
+        knn = self.request.query_params.get('knn', 5)  # Check
+        point = self.request.query_params.get('point', {"longitude": 41.07253, "latitude": 35.95237})
+
+        if date is not None and False:
+            try:
+                date_dt2 = datetime.datetime.strptime(date, '%d-%m-%Y')
+                queryset = queryset.filter(location_date__day=date_dt2.day,
+                                           location_date__month=date_dt2.month,
+                                           location_date__year=date_dt2.year)
+            except Exception as e:
+                print(e)
+                pass
+
+        if point:
+            point = Point(point['longitude'], point['latitude'])
+
+        if radius is not None:
+            queryset = queryset.filter(location__distance_lt=(point, Distance(km=radius)))
+
+        if knn is not None:
+            queryset = queryset.filter(location__distance_lte=(point, D(km=radius)))
+            queryset = queryset[:knn]
+
+        return queryset
+
     def get(self, request, *args, **kwargs):
-        qs = Location.objects.all().values('latitude', 'longitude', 'user_id')
-        data = {}
-        for q in qs:
-            if data.get(q.get('user_id')):
-                data[q.get('user_id')].append({
-                    'latitude': float(q.get('latitude')),
-                    'longitude': float(q.get('longitude'))
-                })
-            else:
-                data[q.get('user_id')] = [{
-                    'latitude': float(q.get('latitude')),
-                    'longitude': float(q.get('longitude'))
-                }]
-        return Response({'locations': data}, template_name="map2.html")
+        qs = self.get_queryset()
+        serializer = LocationSerializer(qs, many=True)
+        return Response({'locations': serializer.data}, template_name="map2.html")

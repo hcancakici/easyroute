@@ -77,10 +77,10 @@ WSGI_APPLICATION = 'easyroute.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': 'easyroute',
         'USER': 'postgres',
-        'PASSWORD': 'examplepassword',
+        'PASSWORD': 'postgres',
         'HOST': 'localhost',
     }
 }

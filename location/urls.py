@@ -9,6 +9,6 @@ router.register(r'', views.LocationViewSet)
 
 
 urlpatterns = [
-    path('/', include(router.urls)),
-    path('map/', views.MapViewSet.as_view(), name="map-view"),
+    path('', include(router.urls)),
+    path('/map/', views.MapViewSet.as_view(), name="map-view"),
 ]

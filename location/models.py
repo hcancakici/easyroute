@@ -1,4 +1,6 @@
 from django.db import models
+from django.contrib.gis.db import models as gismodels
+
 
 # Create your models here.
 
@@ -28,9 +30,8 @@ class LocationUser(BaseModel):
 
 
 class Location(BaseModel):
-    latitude = models.DecimalField(max_digits=11, decimal_places=8)
+    latitude = models.DecimalField(max_digits=11, decimal_places=6)
     longitude = models.DecimalField(max_digits=11, decimal_places=8)
     location_date = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(LocationUser, on_delete=models.SET(get_sentinel_user))
-
-
+    location = gismodels.PointField(null=True, blank=True)
