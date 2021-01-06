@@ -34,8 +34,8 @@ class MapViewSet(generics.ListAPIView):
         queryset = Location.objects.filter(user_id=user_id)
         queryset = Location.objects.all()
         date = self.request.query_params.get('date', None)
-        radius = self.request.query_params.get('radius', 50000)  # KM
-        knn = self.request.query_params.get('knn', 5)  # Check
+        radius = int(self.request.query_params.get('radius', 50000))  # KM
+        knn = int(self.request.query_params.get('knn', 5))  # Check
         point = self.request.query_params.get('point', {"longitude": 41.07253, "latitude": 35.95237})
 
         if date is not None and False:
