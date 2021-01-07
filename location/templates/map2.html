@@ -146,9 +146,23 @@
           <h4 class="mb-3">Select Search Inputs</h4>
 
           <div class="row gy-3">
-            <div class="col-md-3">
+            <div class="col-md-4">
               <label for="knn" class="form-label">KNN</label>
               <input type="number" name="knn" class="form-control" id="knn" placeholder="" required>
+              <div class="invalid-feedback">
+                Knn
+              </div>
+            </div>
+            <div class="col-md-4">
+              <label for="knn" class="form-label">Lat</label>
+              <input type="float" name="knn" class="form-control" disabled="true" id="lat" placeholder="" required>
+              <div class="invalid-feedback">
+                Knn
+              </div>
+            </div>
+            <div class="col-md-4">
+              <label for="knn" class="form-label">Long</label>
+              <input type="decimal" disabled="true" name="knn" class="form-control" id="long" placeholder="" required>
               <div class="invalid-feedback">
                 Knn
               </div>
@@ -187,14 +201,6 @@
         waypoints.push(L.latLng(lat, long))
         L.marker([lat, long]).addTo(map);
     {% endfor %}
-    L.polyline(waypoints).addTo(map)
-    const control = L.Routing.control({
-        waypoints: [
-            L.latLng(41.96, 35.14),
-            L.latLng(41.74, 33.94),
-        ],
-        routeWhileDragging: true,
-    }).addTo(map);
 
     map.on('click', function(e) {
         if (marker) { // check
@@ -204,6 +210,8 @@
         map.addLayer(marker);
         LatestLat = e.latlng.lat
         LatestLong = e.latlng.lng
+        document.getElementById("lat").value = e.latlng.lat;
+        document.getElementById("long").value = e.latlng.lng;
     });
 
     // this is the id of the form
