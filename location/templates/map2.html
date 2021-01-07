@@ -142,34 +142,55 @@
       </div>
       <div id="mapid" class="full-height" ></div>
         <div>
-            <form id="search-form" class="" action="">
-          <h4 class="mb-3">Select Search Inputs</h4>
+          <form id="search-form" class="" action="/locations">
+            <h4 class="mb-3">Selected Point</h4>
+            <div class="row gy-3">
+              <div class="col-md-6">
+                <label for="lat" class="form-label">Lat</label>
+                <input type="float" name="lat" class="form-control" disabled="true" id="lat" placeholder="" >
+                <div class="invalid-feedback">
+                  Lat
+                </div>
+              </div>            
+              <div class="col-md-6">
+                <label for="lng" class="form-label">Long</label>
+                <input type="decimal" disabled="true" name="lng" class="form-control" id="lng" placeholder="">
+                <div class="invalid-feedback">
+                  Lng
+                </div>
+              </div>
+            </div>
+            <h4 class="mb-3">Select Search Inputs</h4>
+            <div class="row gy-3">
+              <div class="col-md-4">
+                <label for="date" class="form-label">Date Search</label>
+                <input type="date" name="date" class="form-control" id="date" placeholder="">
+                <div class="invalid-feedback">
+                  Date Search
+                </div>
+              </div>
+            </div>
+            <div class="row gy-3">
+              <div class="col-md-4">
+                <label for="knn" class="form-label">KNN Search</label>
+                <input type="number" name="knn" class="form-control" id="knn" placeholder="">
+                <div class="invalid-feedback">
+                  Knn
+                </div>
+              </div>
+            </div>
 
-          <div class="row gy-3">
-            <div class="col-md-4">
-              <label for="knn" class="form-label">KNN</label>
-              <input type="number" name="knn" class="form-control" id="knn" placeholder="" required>
-              <div class="invalid-feedback">
-                Knn
+            <div class="row gy-3">
+              <div class="col-md-4">
+                <label for="raidus" class="form-label">Radius Search</label>
+                <input type="number" name="radius" class="form-control" id="radius" placeholder="">
+                <div class="invalid-feedback">
+                  Radius
+                </div>
               </div>
             </div>
-            <div class="col-md-4">
-              <label for="knn" class="form-label">Lat</label>
-              <input type="float" name="knn" class="form-control" disabled="true" id="lat" placeholder="" required>
-              <div class="invalid-feedback">
-                Knn
-              </div>
-            </div>
-            <div class="col-md-4">
-              <label for="knn" class="form-label">Long</label>
-              <input type="decimal" disabled="true" name="knn" class="form-control" id="long" placeholder="" required>
-              <div class="invalid-feedback">
-                Knn
-              </div>
-            </div>
-          </div>
 
-          <hr class="my-4">
+            <hr class="my-4">
 
           <button class="w-100 btn btn-primary btn-lg" type="submit">Search</button>
         </form>
@@ -181,26 +202,41 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 
 <script>
-    var LatestLat = null;
-    var LatestLong = null;
-    var marker;
-    var map = L.map('mapid').setView([41, 34], 10);
+      var LatestLat = null;
+      var LatestLong = null;
+      var marker;
+      var map = L.map('mapid').setView([41, 34], 7);
 
-    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
+      L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map);
+      const waypoints = []
 
-    const waypoints = []
-    let lat;
-    let long;
+    function draw_routes(locations) {
+      let lat;
+      let long;
+      let location;
+      for (var i = 0; i < locations.length; i++) {
+        location = locations[i];
+        lat = location["latitude"];
+        long = location["longitude"];
+        let position = new L.Marker([lat, long]); // set
+        map.addLayer(position);
+      }
+    }
 
-    {% for a in locations %}
-        lat = {{ a.latitude }};
-        long = {{ a.longitude }};
-        console.log(lat, long)
-        waypoints.push(L.latLng(lat, long))
-        L.marker([lat, long]).addTo(map);
-    {% endfor %}
+    function clean_map(keep_point) {
+      console.log(L.Marker);
+      map.eachLayer(function (layer) {
+          if (layer instanceof L.Marker) {
+            map.removeLayer(layer);
+          }
+      });
+      if (keep_point) {
+          marker = new L.Marker([LatestLat, LatestLong]);
+          map.addLayer(marker);
+      }
+    }
 
     map.on('click', function(e) {
         if (marker) { // check
@@ -211,7 +247,7 @@
         LatestLat = e.latlng.lat
         LatestLong = e.latlng.lng
         document.getElementById("lat").value = e.latlng.lat;
-        document.getElementById("long").value = e.latlng.lng;
+        document.getElementById("lng").value = e.latlng.lng;
     });
 
     // this is the id of the form
@@ -220,7 +256,7 @@
         e.preventDefault(); // avoid to execute the actual submit of the form.
         console.log(LatestLat, LatestLong)
         var form = $(this);
-        var data = form.serialize() + '&lat=' + LatestLat +'&long=' + LatestLong
+        var data = form.serialize() + '&lat=' + LatestLat +'&lng=' + LatestLong
         var url = form.attr('action');
         $.ajax({
                type: "GET",
@@ -229,10 +265,13 @@
 
                success: function(data)
                {
-                   alert(data)
+                clean_map(keep_point=marker)
+                draw_routes(data);
+                console.log(data);
                }
              });
     });
+
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
