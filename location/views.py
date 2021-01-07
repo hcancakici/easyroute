@@ -49,7 +49,7 @@ class LocationViewSet(viewsets.ModelViewSet):
 
         if date is not None and False:
             try:
-                date_dt2 = datetime.datetime.strptime(date, '%d-%m-%Y')
+                date_dt2 = datetime.datetime.strptime(date, '%Y-%m-%d')
                 queryset = queryset.filter(location_date__day=date_dt2.day,
                                            location_date__month=date_dt2.month,
                                            location_date__year=date_dt2.year)

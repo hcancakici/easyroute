@@ -181,13 +181,16 @@
             </div>
 
             <div class="row gy-3">
-              <div class="col-md-4">
-                <label for="raidus" class="form-label">Radius Search</label>
-                <input type="number" name="radius" class="form-control" id="radius" placeholder="">
+                  <label for="raidus" class="form-label">Radius Search</label>
+                <div class="col-md-10">
+                  <input type="range" name="radius" class="radius custom-range form-control" id="radius" max="2000" min="0" step="5">
+                </div>
+                <div class="col-md-2">
+                  <input type="text" name="radius_text" class="radius_text form-control" id="radius_text" placeholder=""  disabled="disabled">
+                </div>
                 <div class="invalid-feedback">
                   Radius
                 </div>
-              </div>
             </div>
 
             <hr class="my-4">
@@ -237,6 +240,25 @@
           map.addLayer(marker);
       }
     }
+    let circle = null
+
+    $("#radius").on("action input change", function(e) {
+      let radius = document.getElementById("radius").value
+      document.getElementById("radius_text").value = radius + "KM"
+
+      let circle_point = [LatestLat, LatestLong];
+      let circleOptions = {
+         color: 'red',
+         fillColor: '#f03',
+         fillOpacity: 0
+      }
+      if (circle) {
+        map.removeLayer(circle)
+      }
+      circle = L.circle(circle_point, parseInt(radius)*1000, circleOptions);
+      circle.addTo(map);
+
+    });
 
     map.on('click', function(e) {
         if (marker) { // check
@@ -248,6 +270,19 @@
         LatestLong = e.latlng.lng
         document.getElementById("lat").value = e.latlng.lat;
         document.getElementById("lng").value = e.latlng.lng;
+        if (circle) {
+          map.removeLayer(circle)
+          let radius = document.getElementById("radius").value
+          let circle_point = [LatestLat, LatestLong];
+          let circleOptions = {
+             color: 'red',
+             fillColor: '#f03',
+             fillOpacity: 0
+          }
+          circle = L.circle(circle_point, parseInt(radius)*1000, circleOptions);
+          circle.addTo(map);
+
+        }
     });
 
     // this is the id of the form
