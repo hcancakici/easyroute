@@ -1,33 +1,36 @@
 import datetime
+import json
 
+from django.contrib.auth import login
+from django.contrib.auth.models import User
 from django.contrib.gis.geos import Point
 from django.contrib.gis.measure import Distance
 from django.contrib.gis.db.models.functions import Distance as func_Distance
 
+from django.http import HttpResponse
 
 from rest_framework import viewsets, generics
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
 
-from location.serializers import LocationSerializer, LocationUserSerializer
-from location.models import Location, LocationUser
-
-
-class LocationUserViewSet(viewsets.ModelViewSet):
-    queryset = LocationUser.objects.all()
-    serializer_class = LocationUserSerializer
-    ordering_fields = '__all__'
+from location.serializers import LocationCreateSerializer, LocationListSerializer
+from location.models import Location
 
 
 class LocationViewSet(viewsets.ModelViewSet):
     queryset = Location.objects.all()
-    serializer_class = LocationSerializer
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
     ordering_fields = '__all__'
 
     def get_queryset(self):
-        user_id = self.request.query_params.get('user_id', 9)
-        queryset = Location.objects.filter(user_id=user_id)
-        queryset = Location.objects.all()
+        if self.request.user and self.request.user.is_superuser:
+            queryset = Location.objects.all()
+        else:
+            queryset = Location.objects.filter(username=self.request.user.username)
+
         date = self.request.query_params.get('date', None)
 
         try:
@@ -68,12 +71,37 @@ class LocationViewSet(viewsets.ModelViewSet):
 
         return queryset
 
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return LocationCreateSerializer
+
+        return LocationListSerializer
+
 
 class MapViewSet(generics.ListAPIView):
-    serializer_class = LocationSerializer
+    serializer_class = LocationListSerializer
     template_name = "map2.html"
     renderer_classes = [TemplateHTMLRenderer]
     http_method_names = ['get', 'post']
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
         return Response({}, template_name="map2.html")
+
+
+def signup(request):
+    if request.method == 'POST':
+        body_unicode = request.body.decode('utf-8')
+        body = json.loads(body_unicode)
+        try:
+            username = body['username']
+            password = body['password']
+        except KeyError:
+            return HttpResponse("404")
+
+        user, is_created = User.objects.get_or_create(username=username, password=password)
+        login(request, user)
+        return HttpResponse("201")
+
+    return HttpResponse("404")

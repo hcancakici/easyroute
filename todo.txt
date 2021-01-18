@@ -1,0 +1,19 @@
+trajectory include or not
+username çıktı olarak alınacak search sonunda
+admine liste şeklinde gösterme
+	--burada hangi
+tarih ve saat aralıklı sorgulamalar + uzamsal (bölge seçemeli)
+admin için çeşitli (+100) kullanıcı izi oluştur
+frontend için performans sıkıntılarına çözüm
+--data indexleme
+data indexlemeyi gerçekle, performans farkını analiz et
+
+
+
+
+
+mobil
+--rota id isimlendirme veya autogenerate
+--rota sonunda locationları aktifleştirme isteği atmalı
+
+--is_active = False default, rota bitince is_active=True
