@@ -101,6 +101,10 @@ def signup(request):
             return HttpResponse("404")
 
         user, is_created = User.objects.get_or_create(username=username, password=password)
+        if is_created:
+            user.set_password(password)
+
+        user.save()
         login(request, user)
         return HttpResponse("201")
 
