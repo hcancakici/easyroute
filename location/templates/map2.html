@@ -42,35 +42,20 @@
   </button>
   <ul class="navbar-nav px-3">
     <li class="nav-item text-nowrap">
-      {% if user.is_authenticated %}
-        <a class="nav-link" href="/accounts/logout/">Sign out</a>
-      {% else %}
-        <a class="nav-link" href="/accounts/login/">Sign in</a>
-      {% endif %}
-
+      <a class="nav-link" href="#">Sign out</a>
     </li>
   </ul>
 </header>
 
 <div class="container-fluid">
-  <div class="row">
+  
     
 
     <main class="col-md-12 ms-sm-auto col-lg-12 px-md-12 container">
-      <div class="container d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-      </div>
-
-      <div id="mapid" class="container col-md-11 full-height" ></div>
-
-      {% if user.is_authenticated and user.is_superuser%}
-        <div class="container col-md-12">
-          <div>
-            Admin User Tablosu Gelecek
-          </div>
-        </div>
-      {% endif %}
-
-      <div class="container col-md-12">
+      <div class="container d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"></div>
+        <div class="row container">
+      <div id="mapid" class="col-md-7" ></div>
+      <div class="container col-md-4">
           <hr class="my-4">
           <h4 class="mb-3">Selected Point</h4>
 
@@ -115,10 +100,10 @@
 
           <div class="row gy-3">
                 <label for="radius_text" class="form-label">Radius Search</label>
-              <div class="col-md-10">
-                <input type="range" name="radius" class="radius custom-range form-control" id="radius" max="300" min="0" step="1">
+              <div class="col-md-9">
+                <input type="range" name="radius" class="radius custom-range form-control" id="radius" max="400" min="0" >
               </div>
-              <div class="col-md-2">
+              <div class="col-md-3">
                 <input type="text" name="radius_text" class="radius_text form-control" id="radius_text" placeholder=""  disabled="disabled">
               </div>
               <div class="invalid-feedback">
@@ -127,13 +112,48 @@
           </div>
 
           <hr class="my-4">
-
-        <button class="w-100 btn btn-primary btn-lg" type="submit">Search</button>
+        <div class="row">
+          <div class="col-md-4">
+            <button class="w-100 btn btn-light btn-lg" type="reset" onclick="clean_map()">Clear</button>
+          </div>
+          <div class="col-md-8">
+            <button class="w-100 btn btn-primary btn-lg" type="submit">Search</button>
+          </div>        
+        </div>
       </form>
+      </div>
+      <hr class="my-4">
+      <div class="col-md-12" id="table-div">
+      <table class="table" id="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">User</th>
+            <th scope="col">Route</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">1</th>
+            <td>Mark</td>
+            <td>Otto</td>
+          </tr>
+          <tr>
+            <th scope="row">2</th>
+            <td>Jacob</td>
+            <td>Thornton</td>
+          </tr>
+          <tr>
+            <th scope="row">3</th>
+            <td>Larry</td>
+            <td>the Bird</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
       </div>
     </main>
   </div>
-</div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 
@@ -161,6 +181,8 @@
       }
     }
 
+    let circle = null
+
     function clean_map(keep_point) {
       console.log(L.Marker);
       map.eachLayer(function (layer) {
@@ -172,8 +194,42 @@
           marker = new L.Marker([LatestLat, LatestLong]);
           map.addLayer(marker);
       }
+      if (circle) {
+        map.removeLayer(circle)
+        let radius = document.getElementById("radius").value = 0;
+        console.log("radius value: ", radius)
+      }
     }
-    let circle = null
+
+    function draw_table(data) {
+      var div = document.getElementById("table-div");
+      div.innerHTML = "<table class='table' id='table'>" +
+        '<thead> ' +
+        '  <tr> ' +
+        '    <th scope="col">#</th>' +
+        '    <th scope="col">User</th>' +
+        '    <th scope="col">Route</th>' +
+        '  </tr>' +
+        '</thead>' +
+        '<tbody>'
+      for (var i=0; i < data; i++) {
+        let row = data[i];
+
+      }
+      div.innerHTML += "</tbody></table>"
+    }
+
+    function clean_table() {
+      var Parent = document.getElementById("table");
+      if (Parent) {
+        while(Parent.hasChildNodes())
+        {
+           Parent.removeChild(Parent.firstChild);
+        }
+      }
+    }
+
+    
 
     $("#radius").on("action input change", function(e) {
       let radius = document.getElementById("radius").value
@@ -233,10 +289,10 @@
 
                success: function(data)
                {
-                clean_map(keep_point=marker)
-                var id = {{ author.id }}
-                console.log(id)
+                clean_map(keep_point=marker);
+                clean_table();
                 draw_routes(data);
+                draw_table(data);
                 console.log(data);
                }
              });
