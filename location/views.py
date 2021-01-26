@@ -69,7 +69,6 @@ class LocationViewSet(viewsets.ModelViewSet):
             ).order_by('distance')
             queryset = queryset[:knn]
 
-        queryset = Location.objects.all()
         return queryset
 
     def retrieve(self, request, *args, **kwargs):

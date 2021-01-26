@@ -245,8 +245,6 @@ console.log("                    ___\n                _.-'   ```'--.._          
         color_array_index++;
       }
     }
-          var point1 = null 
-      var point2 = null 
     let circle = null
 
     function clean_map(keep_point) {
@@ -318,50 +316,6 @@ console.log("                    ___\n                _.-'   ```'--.._          
     map.on('click', function(e) {
         if (marker) { // check
             map.removeLayer(marker); // remove
-        }
-        console.log(e.latlng.lat)
-        if (point1 == null) {
-          point1 = [e.latlng.lat, e.latlng.lng];
-        } else if (point2 == null){
-          point2 = [e.latlng.lat, e.latlng.lng];
-        }
-        else {
-          let mmm = L.Routing.control({
-            waypoints: [
-              L.latLng(point1[0], point1[1]),
-              L.latLng(point2[0], point2[1])
-            ]
-          })
-          //console.log(mmm._routes[0].coordinates)
-          mmm.addTo(map)
-          mmm.on("routesfound", function(e) {
-            let cc = e.routes[0].coordinates;
-            console.log(e.routes[0])
-            let data = []
-            for (var i = 0; i < cc.length; i++) {
-                data.push([cc[i].lat,cc[i].lng]);
-            }
-            console.log(data)
-            $.ajax({
-               type: "POST",
-               processData: false,
-               contentType: "application/json; charset=utf-8",
-               url: "http://127.0.0.1:5000/create",
-               crossDomain: true,
-               dataType: "jsonp",
-               data: JSON.stringify(data), // serializes the form's elements.
-
-               success: function(data)
-               {
-                console.log("success")
-               }
-             });
-
-          });
-          clean_map(keep_point=marker);
-
-          point1 = null
-          point2 = null
         }
 
         marker = new L.Marker(e.latlng); // set
