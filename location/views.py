@@ -69,7 +69,24 @@ class LocationViewSet(viewsets.ModelViewSet):
             ).order_by('distance')
             queryset = queryset[:knn]
 
+        queryset = Location.objects.all()
         return queryset
+
+    def retrieve(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        return Response(self._group_by_route(queryset))
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        return Response(self._group_by_route(queryset))
+
+    def _group_by_route(self, queryset):
+        groups = {}
+        routes = queryset.values_list("route_id", flat=True)
+        for route in routes:
+            groups[route] = LocationListSerializer(queryset.filter(route_id=route), many=True).data
+
+        return groups
 
     def get_serializer_class(self):
         if self.request.method == 'POST':

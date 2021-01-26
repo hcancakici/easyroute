@@ -162,6 +162,47 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 
 <script>
+console.log("                    ___\n                _.-'   ```'--.._                 _____ ___ ___   ____  _____ __ __      ______  __ __    ___  \n              .'                `-._            / ___/|   |   | /    |/ ___/|  |  |    |      ||  |  |  /  _] \n             /                      `.         (   \\_ | _   _ ||  o  (   \\_ |  |  |    |      ||  |  | /  [_        \n            /                         `.        \\__  ||  \\_/  ||     |\\__  ||  _  |    |_|  |_||  _  ||    _]       \n           /                            `.      /  \\ ||   |   ||  _  |/  \\ ||  |  |      |  |  |  |  ||   [_        \n          :       (                       \\     \\    ||   |   ||  |  |\\    ||  |  |      |  |  |  |  ||     |       \n          |    (   \\_                  )   `.    \\___||___|___||__|__| \\___||__|__|      |__|  |__|__||_____|       \n          |     \\__/ '.               /  )  ;  \n          |   (___:    \\            _/__/   ;    ____   ____  ______  ____   ____   ____  ____      __  __ __  __ __ \n          :       | _  ;          .'   |__) :   |    \\ /    ||      ||    \\ |    | /    ||    \\    /  ]|  |  ||  |  |\n           :      |` \\ |         /     /   /    |  o  )  o  ||      ||  D  ) |  | |  o  ||  D  )  /  / |  |  ||  |  |\n            \\     |_  ;|        /`\\   /   /     |   _/|     ||_|  |_||    /  |  | |     ||    /  /  /  |  _  ||  ~  |\n             \\    ; ) :|       ;_  ; /   /      |  |  |  _  |  |  |  |    \\  |  | |  _  ||    \\ /   \\_ |  |  ||___, |\n              \\_  .-''-.       | ) :/   /       |  |  |  |  |  |  |  |  .  \\ |  | |  |  ||  .  \\\\     ||  |  ||     |\n             .-         `      .--.'   /        |__|  |__|__|  |__|  |__|\\_||____||__|__||__|\\_| \\____||__|__||____/ \n            :         _.----._     `  < \n            :       -'........'-       `.\n             `.        `''''`           ;\n               `'-.__                  ,'\n                     ``--.   :'-------'\n                         :   :\n                        .'   '.\n      \n      \n                                                                    ");
+
+      var colorArray = [
+        "#ffd700",
+        "#ffc0cb",        
+        "#ff0000",
+        "#00008b",
+        "#800080",
+        "#00ffff",
+        "#000000",
+        "#0000ff",
+        "#a52a2a",
+        "#00ffff",
+        "#a9a9a9",
+        "#006400",
+        "#bdb76b",
+        "#8b008b",
+        "#556b2f",
+        "#ff8c00",
+        "#9932cc",
+        "#8b0000",
+        "#e9967a",
+        "#9400d3",
+        "#ff00ff",
+        "#008000",
+        "#4b0082",
+        "#add8e6",
+        "#e0ffff",
+        "#90ee90",
+        "#d3d3d3",
+        "#ffb6c1",
+        "#ffffe0",
+        "#00ff00",
+        "#ff00ff",
+        "#800000",
+        "#000080",
+        "#808000",
+        "#ffa500",
+        "#800080",
+        "#c0c0c0",
+        "#ffff00"];
       var LatestLat = null;
       var LatestLong = null;
       var marker;
@@ -172,19 +213,40 @@
       }).addTo(map);
       const waypoints = []
 
+
+
+
+
+
     function draw_routes(locations) {
       let lat;
       let long;
       let location;
-      for (var i = 0; i < locations.length; i++) {
-        location = locations[i];
-        lat = location["latitude"];
-        long = location["longitude"];
-        let position = new L.Marker([lat, long]); // set
-        map.addLayer(position);
+      let color_array_index = 0 
+
+      for (const [key, value] of Object.entries(locations)) {
+        route_locations = value;
+        var latlngs = Array();
+        for (var i = 0; i < route_locations.length; i++) {
+          route_location = route_locations[i];
+          lat = route_location["latitude"];
+          long = route_location["longitude"];
+          let position = new  L.Marker([lat, long]); // set
+          L.circleMarker([lat, long], {
+            "radius": 5,
+            "fillColor": colorArray[color_array_index],
+            "color": colorArray[color_array_index],
+            "weight": 5,
+            "opacity": 10,
+          }).addTo(map);
+          latlngs.push(position.getLatLng());
+        }
+        let polyline = L.polyline(latlngs, {color: colorArray[color_array_index]}).addTo(map);
+        color_array_index++;
       }
     }
-
+          var point1 = null 
+      var point2 = null 
     let circle = null
 
     function clean_map(keep_point) {
@@ -257,6 +319,51 @@
         if (marker) { // check
             map.removeLayer(marker); // remove
         }
+        console.log(e.latlng.lat)
+        if (point1 == null) {
+          point1 = [e.latlng.lat, e.latlng.lng];
+        } else if (point2 == null){
+          point2 = [e.latlng.lat, e.latlng.lng];
+        }
+        else {
+          let mmm = L.Routing.control({
+            waypoints: [
+              L.latLng(point1[0], point1[1]),
+              L.latLng(point2[0], point2[1])
+            ]
+          })
+          //console.log(mmm._routes[0].coordinates)
+          mmm.addTo(map)
+          mmm.on("routesfound", function(e) {
+            let cc = e.routes[0].coordinates;
+            console.log(e.routes[0])
+            let data = []
+            for (var i = 0; i < cc.length; i++) {
+                data.push([cc[i].lat,cc[i].lng]);
+            }
+            console.log(data)
+            $.ajax({
+               type: "POST",
+               processData: false,
+               contentType: "application/json; charset=utf-8",
+               url: "http://127.0.0.1:5000/create",
+               crossDomain: true,
+               dataType: "jsonp",
+               data: JSON.stringify(data), // serializes the form's elements.
+
+               success: function(data)
+               {
+                console.log("success")
+               }
+             });
+
+          });
+          clean_map(keep_point=marker);
+
+          point1 = null
+          point2 = null
+        }
+
         marker = new L.Marker(e.latlng); // set
         map.addLayer(marker);
         LatestLat = e.latlng.lat
@@ -277,7 +384,6 @@
 
         }
     });
-
     // this is the id of the form
     $("#search-form").submit(function(e) {
 
