@@ -305,9 +305,17 @@ console.log("                    ___\n                _.-'   ```'--.._          
         '  </tr>' +
         '</thead>' +
         '<tbody>'
-      for (var i=0; i < data; i++) {
-        let row = data[i];
-
+      var i = 0;
+      for (const [key, value] of Object.entries(data)) {
+        i++;
+        let username = value[0]['username'];
+        let route_id = value[0]['route_id'];
+        $(table).find('tbody').append("<tr><th scope='row'>" + i + "</th>"+"<td>"+ username +"</td>"+"<td>"+ route_id +"</td></tr>");
+        // div.innerHTML += '<tr>' +
+        //     '<th scope="row">'+ i +'</th>' +
+        //     '<td>'+ user +'</td>' +
+        //     '<td>'+ route_id +'</td>' +
+        //   '</tr>'
       }
       div.innerHTML += "</tbody></table>"
     }
