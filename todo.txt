@@ -17,3 +17,23 @@ mobil
 --rota sonunda locationları aktifleştirme isteği atmalı
 
 --is_active = False default, rota bitince is_active=True
+
+
+
+
+
+27.01.2021
+
+-- radius fixleme
+
+-- map üstünde rota isimlendirme
+-- map üstünde rota focus
+
+-- tablo
+-- tabloya link, rotaya focus
+-- tabloya user filtresi (öncelikli değil)
+
+-- admin için user filtrei, hem text, hem multiselect dropdown
+
+
+-- datetime

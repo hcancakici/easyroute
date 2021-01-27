@@ -34,7 +34,7 @@ class LocationViewSet(viewsets.ModelViewSet):
         date = self.request.query_params.get('date', None)
 
         try:
-            radius = int(self.request.query_params.get('radius'))  # KM
+            radius = int(self.request.query_params.get('radius')) / 10  # KM
         except:
             radius = None
         try:
@@ -68,7 +68,6 @@ class LocationViewSet(viewsets.ModelViewSet):
                 distance=func_Distance('location', point)
             ).order_by('distance')
             queryset = queryset[:knn]
-
         return queryset
 
     def retrieve(self, request, *args, **kwargs):
@@ -81,7 +80,7 @@ class LocationViewSet(viewsets.ModelViewSet):
 
     def _group_by_route(self, queryset):
         groups = {}
-        routes = queryset.values_list("route_id", flat=True)
+        routes = set(queryset.values_list("route_id", flat=True))
         for route in routes:
             groups[route] = LocationListSerializer(queryset.filter(route_id=route), many=True).data
 

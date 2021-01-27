@@ -105,7 +105,7 @@
           <div class="row gy-3">
                 <label for="radius_text" class="form-label">Radius Search</label>
               <div class="col-md-9">
-                <input type="range" name="radius" class="radius custom-range form-control" id="radius" max="400" min="0" >
+                <input type="range" name="radius" class="radius custom-range form-control" id="radius" max="200" min="0" >
               </div>
               <div class="col-md-3">
                 <input type="text" name="radius_text" class="radius_text form-control" id="radius_text" placeholder=""  disabled="disabled">
@@ -206,49 +206,74 @@ console.log("                    ___\n                _.-'   ```'--.._          
       var LatestLat = null;
       var LatestLong = null;
       var marker;
-      var map = L.map('mapid').setView([41, 34], 7);
+      var map = L.map('mapid', {renderer: L.canvas()}).setView([41.0697, 28.934], 10);
+      var polylines = null;
+      var circleMarkers = null;
 
       L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
           attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
       }).addTo(map);
       const waypoints = []
 
-
-
-
-
-
     function draw_routes(locations) {
       let lat;
       let long;
       let location;
       let color_array_index = 0 
+      polylines = new L.FeatureGroup();
+      circleMarkers = new L.FeatureGroup()
+      var polyline = null
 
       for (const [key, value] of Object.entries(locations)) {
         route_locations = value;
-        var latlngs = Array();
-        for (var i = 0; i < route_locations.length; i++) {
+        let latlngs = Array();
+        let i = 1;
+
+        // Begining of the route
+        let lat = route_locations[0]["latitude"];
+        let long = route_locations[0]["longitude"];
+        L.circleMarker([lat, long], {
+            "radius": 4,
+            "fillColor": colorArray[color_array_index],
+            "color": colorArray[color_array_index],
+            "weight": 2,
+            "opacity": 0.7,
+          }).addTo(circleMarkers)
+        for (i = 1; i < route_locations.length-1; i++) {
           route_location = route_locations[i];
           lat = route_location["latitude"];
           long = route_location["longitude"];
           let position = new  L.Marker([lat, long]); // set
-          L.circleMarker([lat, long], {
+          latlngs.push(position.getLatLng());
+        }
+
+        // End of the route
+        lat = route_locations[route_locations.length-1]["latitude"];
+        long = route_locations[route_locations.length-1]["longitude"];
+        L.circleMarker([lat, long], {
             "radius": 5,
             "fillColor": colorArray[color_array_index],
             "color": colorArray[color_array_index],
-            "weight": 5,
-            "opacity": 10,
-          }).addTo(map);
-          latlngs.push(position.getLatLng());
-        }
-        let polyline = L.polyline(latlngs, {color: colorArray[color_array_index]}).addTo(map);
+            "weight": 6,
+            "opacity": 1,
+          }).addTo(circleMarkers);
+
+        circleMarkers.addTo(map);
+
+        polyline = L.polyline(latlngs, {color: colorArray[color_array_index]}).bindPopup(route_locations[0].route_id);
+        polyline.on('click', function () {
+          map.fitBounds(this.getBounds());
+        });
+
+        polyline.addTo(polylines)
         color_array_index++;
       }
+      polylines.addTo(map)
+      map.fitBounds(polylines.getBounds())
     }
     let circle = null
 
     function clean_map(keep_point) {
-      console.log(L.Marker);
       map.eachLayer(function (layer) {
           if (layer instanceof L.Marker) {
             map.removeLayer(layer);
@@ -259,9 +284,13 @@ console.log("                    ___\n                _.-'   ```'--.._          
           map.addLayer(marker);
       }
       if (circle) {
-        map.removeLayer(circle)
-        let radius = document.getElementById("radius").value = 0;
-        console.log("radius value: ", radius)
+        map.removeLayer(circle);
+      }
+      if (polylines) {
+        map.removeLayer(polylines);
+      }
+      if (circleMarkers) {
+        map.removeLayer(circleMarkers);
       }
     }
 
@@ -297,7 +326,9 @@ console.log("                    ___\n                _.-'   ```'--.._          
 
     $("#radius").on("action input change", function(e) {
       let radius = document.getElementById("radius").value
-      document.getElementById("radius_text").value = radius + "KM"
+      let meter = radius * 100;
+      let km = meter / 1000;
+      document.getElementById("radius_text").value = km + "KM"
 
       let circle_point = [LatestLat, LatestLong];
       let circleOptions = {
@@ -308,7 +339,7 @@ console.log("                    ___\n                _.-'   ```'--.._          
       if (circle) {
         map.removeLayer(circle)
       }
-      circle = L.circle(circle_point, parseInt(radius)*1000, circleOptions);
+      circle = L.circle(circle_point, parseInt(radius)*100, circleOptions);
       circle.addTo(map);
 
     });
@@ -335,14 +366,12 @@ console.log("                    ___\n                _.-'   ```'--.._          
           }
           circle = L.circle(circle_point, parseInt(radius)*1000, circleOptions);
           circle.addTo(map);
-
         }
     });
     // this is the id of the form
     $("#search-form").submit(function(e) {
 
         e.preventDefault(); // avoid to execute the actual submit of the form.
-        console.log(LatestLat, LatestLong)
         var form = $(this);
         var data = form.serialize() + '&lat=' + LatestLat +'&lng=' + LatestLong
         var url = form.attr('action');
@@ -357,7 +386,6 @@ console.log("                    ___\n                _.-'   ```'--.._          
                 clean_table();
                 draw_routes(data);
                 draw_table(data);
-                console.log(data);
                }
              });
     });
