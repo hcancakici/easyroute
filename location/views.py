@@ -26,21 +26,20 @@ class LocationViewSet(viewsets.ModelViewSet):
     ordering_fields = '__all__'
 
     def get_queryset(self):
-        if self.request.user and self.request.user.is_superuser:
-            queryset = Location.objects.all()
-        else:
-            queryset = Location.objects.filter(username=self.request.user.username)
-
+        user_filter = self.request.query_params.get('user_filter', None)
         from_date = self.request.query_params.get('from_date', None)
         to_date = self.request.query_params.get('to_date', None)
 
         try:
             radius = int(self.request.query_params.get('radius')) / 10  # KM
-        except:
+        except Exception as e:
+            print(e)
             radius = None
+
         try:
             knn = int(self.request.query_params.get('knn'))
-        except:
+        except Exception as e:
+            print(e)
             knn = None
 
         try:
@@ -48,8 +47,17 @@ class LocationViewSet(viewsets.ModelViewSet):
             lng = float(self.request.query_params.get('lng'))
             point = Point(lng, lat)
             point.srid = 4326
-        except:
+        except Exception as e:
+            print(e)
             point = None
+
+        if self.request.user and self.request.user.is_superuser:
+            queryset = Location.objects.all()
+            if user_filter:
+                queryset = queryset.filter(username=user_filter)
+
+        else:
+            queryset = Location.objects.filter(username=self.request.user.username)
 
         if from_date is not None:
             try:
@@ -122,6 +130,7 @@ class MapViewSet(generics.ListAPIView):
                     username__isnull=False,
                     route_id__isnull=False).count()
                 route_count = len(set(Location.objects.values_list("route_id", flat=True)))
+                user_list = User.objects.all()
             else:
                 user_count = 1
                 points = Location.objects.filter(
@@ -130,8 +139,9 @@ class MapViewSet(generics.ListAPIView):
                     username=request.user.username)
                 route_count = len(set(points.values_list("route_id", flat=True)))
                 point_count = points.count()
+                user_list = {}
 
-            return Response({"user_count": user_count, "point_count": point_count, "route_count": route_count}, template_name="newfile.html")
+            return Response({"user_count": user_count, "point_count": point_count, "route_count": route_count, "user_list": user_list}, template_name="newfile.html")
         return Response({}, template_name="newfile.html")
 
 
