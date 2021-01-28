@@ -21,9 +21,8 @@ def create_location():
         i = 0
         while True:
             i += 1
-            with open('loc_data_{}.txt'.format(str(i)), 'r') as filehandle:
+            with open('lokasyonlar/loc_data_{}.txt'.format(str(i)), 'r') as filehandle:
                 random_user = randint(0, 10)
-                random_user = 0
                 name = list(names)
                 name = name[random_user]
                 names[name] += 1
@@ -33,6 +32,7 @@ def create_location():
                 my_date = datetime.datetime.now()
                 my_date = my_date.replace(hour=random_hour)
                 my_date = my_date.replace(day=random_day)
+                print(my_date)
                 locations = json.load(filehandle)
                 seconds = 15
 
@@ -42,7 +42,7 @@ def create_location():
                     lon = float(lon)
                     point = Point(lon, lat)
                     point.srid = 4326
-                    Location.objects.create(
+                    lo = Location.objects.create(
                         username=name,
                         location=point,
                         latitude=lat,
@@ -51,6 +51,8 @@ def create_location():
                         is_active=True,
                         location_date=my_date
                     )
+                    lo = Location.objects.filter(id=lo.id)
+                    lo.update(location_date=my_date)
                     my_date = my_date + datetime.timedelta(seconds=seconds)
     except Exception as e:
         print(e)

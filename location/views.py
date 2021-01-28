@@ -31,7 +31,8 @@ class LocationViewSet(viewsets.ModelViewSet):
         else:
             queryset = Location.objects.filter(username=self.request.user.username)
 
-        date = self.request.query_params.get('date', None)
+        from_date = self.request.query_params.get('from_date', None)
+        to_date = self.request.query_params.get('to_date', None)
 
         try:
             radius = int(self.request.query_params.get('radius')) / 10  # KM
@@ -50,12 +51,17 @@ class LocationViewSet(viewsets.ModelViewSet):
         except:
             point = None
 
-        if date is not None and False:
+        if from_date is not None:
             try:
-                date_dt2 = datetime.datetime.strptime(date, '%Y-%m-%d')
-                queryset = queryset.filter(location_date__day=date_dt2.day,
-                                           location_date__month=date_dt2.month,
-                                           location_date__year=date_dt2.year)
+                from_date = datetime.datetime.strptime(from_date, '%Y/%m/%d %H:%M')
+                queryset = queryset.filter(location_date__gte=from_date)
+            except Exception as e:
+                print(e)
+                pass
+        if to_date is not None:
+            try:
+                to_date = datetime.datetime.strptime(to_date, '%Y/%m/%d %H:%M')
+                queryset = queryset.filter(location_date__lte=to_date)
             except Exception as e:
                 print(e)
                 pass
@@ -64,10 +70,16 @@ class LocationViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(location__distance_lt=(point, Distance(km=radius)))
 
         if point and knn is not None:
-            queryset = queryset.annotate(
-                distance=func_Distance('location', point)
-            ).order_by('distance')
-            queryset = queryset[:knn]
+            queryset = queryset.annotate(distance=func_Distance('location', point)).order_by('distance')
+            closest_routes = []
+            for loc in queryset:
+                if len(closest_routes) == knn:
+                    break
+                if loc.route_id not in closest_routes:
+                    closest_routes.append(loc.route_id)
+
+            queryset = queryset.filter(route_id__in=closest_routes).order_by('location_date')
+
         return queryset
 
     def retrieve(self, request, *args, **kwargs):
