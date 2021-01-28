@@ -87,14 +87,14 @@ WSGI_APPLICATION = 'easyroute.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'easyroute2',
+        'NAME': 'easyroute',
         'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': 'localhost',
+        'PASSWORD': 'Easy123!@#',
+        'HOST': 'easyroute.can.yozel.co',
     }
 }
 
-LOGIN_REDIRECT_URL = '/locations'
+LOGIN_REDIRECT_URL = '/locations/map/'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 
 
