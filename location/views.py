@@ -114,6 +114,24 @@ class MapViewSet(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
+        if request.user:
+            if request.user.is_superuser:
+                user_count = User.objects.count()
+                point_count = Location.objects.filter(
+                    is_active=True,
+                    username__isnull=False,
+                    route_id__isnull=False).count()
+                route_count = len(set(Location.objects.values_list("route_id", flat=True)))
+            else:
+                user_count = 1
+                points = Location.objects.filter(
+                    is_active=True,
+                    route_id__isnull=False,
+                    username=request.user.username)
+                route_count = len(set(points.values_list("route_id", flat=True)))
+                point_count = points.count()
+
+            return Response({"user_count": user_count, "point_count": point_count, "route_count": route_count}, template_name="newfile.html")
         return Response({}, template_name="newfile.html")
 
 
