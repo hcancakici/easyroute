@@ -102,7 +102,7 @@ class MapViewSet(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
-        return Response({}, template_name="map2.html")
+        return Response({}, template_name="newfile.html")
 
 
 def signup(request):
