@@ -201,16 +201,10 @@
                                     
                                     <div class="form-row">
                                        <div class="form-group"><label for="from_date">From Date</label><input name="from_date" type="datetime" class="form-control from_date" id="from_date" ></div>
-                                    </div>
-                                    <div class="form-row">
                                        <div class="form-group"><label for="to_date">To Date</label><input name="to_date" type="datetime" class="form-control to_date" id="to_date" ></div>
                                     </div>
-                                    <div class="form-row">
                                        <div class="form-group"><label for="knn">KNN Search</label><input name="knn" type="text" class="form-control knn" id="knn"></div>
-                                    </div>
-                                    <div class="form-row">
                                        <div class="form-group"><label for="radius">Radius</label><input name="radius" type="range" class="radius form-control"  max="200" min="0" id="radius"><input type="text" name="radius_text" class="radius_text form-control" id="radius_text" placeholder=""  disabled="disabled"></div>
-                                    </div>
 
                                        <div class="form-group">
                                           <button type="reset" class="btn btn-gray col-md-4">Clear</button>
@@ -277,11 +271,11 @@
                         <div class="bd bgc-white">
                            <div class="layers">
                               <div class="layer w-100 p-20">
-                                 <h6 class="lh-1">Sales Report</h6>
+                                 <h6 class="lh-1">Route List</h6>
                               </div>
                               <div class="layer w-100">
-                                 <div class="table-responsive p-20">
-                                    <table class="table">
+                                 <div class="table-responsive p-20" id="table-div">
+                                    <table class="table" id="table">
                                        <thead>
                                           <tr>
                                              <th class="bdwT-0">Name</th>
