@@ -8,14 +8,13 @@ from location import views
 
 router = routers.DefaultRouter()
 
-router.register(r'', views.LocationViewSet)
+router.register(r'', views.LocationBusyViewSet)
 
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('/map/', login_required(views.MapViewSet.as_view()), name="map-view"),
     path('/map-busy/', login_required(views.MapBusyViewSet.as_view()), name="busy-view"),
-    path('/signup/', csrf_exempt(views.signup), name='signup'),
-    path('/friend_list', views.friend_list, name='friend-list'),
-    path('/friend_list_detail', login_required(views.FriendListViewSet.as_view()), name='friend-list-detail'),
+    path('/signup/', csrf_exempt(views.signup), name='signup-key'),
+    path('/friend_list', views.friend_list, name='friend-list-key'),
+    path('/friend_list_detail', login_required(views.FriendListViewSet.as_view()), name='friend-list-detail-key'),
 ]

@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.postgres.fields import ArrayField
 from django.contrib.gis.db import models as gismodels
 
 
@@ -14,6 +15,11 @@ class BaseModel(models.Model):
         if update_fields is not None:
             update_fields.append('modified_date')
         super(BaseModel, self).save(*args, **kwargs)
+
+
+class FriendList(BaseModel):
+    username = models.CharField(max_length=512, unique=True)
+    friend_list = ArrayField(models.CharField(max_length=512, unique=True), size=2048)
 
 
 class Location(BaseModel):

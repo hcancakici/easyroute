@@ -49,7 +49,7 @@
                   </div>
                </div>
                <ul class="sidebar-menu scrollable pos-r">
-                  <li class="nav-item mT-30 active"><a class="sidebar-link" href="/location/map/" default><span class="icon-holder"><i class="c-blue-500 ti-home"></i> </span><span class="title">Dashboard</span></a></li>
+                  <li class="nav-item mT-30 active"><a class="sidebar-link" href="/locations/map/" default><span class="icon-holder"><i class="c-blue-500 ti-home"></i> </span><span class="title">Dashboard</span></a></li>
                   <li class="nav-item"><a class="sidebar-link" href="{% url 'friend-list-detail' %}"><span class="icon-holder"><i class="c-brown-500 ti-email"></i> </span><span class="title">Arkadaş Yönetimi</span></a></li>
                   <li class="nav-item"><a class="sidebar-link" href="{% url 'busy-view' %}"><span class="icon-holder"><i class="c-brown-500 ti-email"></i> </span><span class="title">Yoğunluk Analizi</span></a></li>
                   <li class="nav-item dropdown">
@@ -91,16 +91,16 @@
                      <div class="masonry-sizer col-md-6"></div>
                         <div class="masonry-item w-100">
                            <div class="row gap-20">
-                              <div class="col-md-3">
+                              <div class="col-md-4">
                                  <div class="layers bd bgc-white p-20">
                                     {% if user.is_superuser %}
                                        <div class="layer w-100 mB-10">
-                                          <h6 class="lh-1">Total Users</h6>
+                                          <h6 class="lh-1">En Yoğun Saat</h6>
                                        </div>
                                        <div class="layer w-100">
                                           <div class="peers ai-sb fxw-nw">
                                              <div class="peer peer-greed"><span id="sparklinedash"></span></div>
-                                             <div class="peer"><span class="d-ib lh-0 va-m fw-600 bdrs-10em pX-15 pY-15 bgc-green-50 c-green-500">{{ user_count }}</span></div>
+                                             <div class="peer"><span id="date_range_class" class="date_range_class d-ib lh-0 va-m fw-600 bdrs-10em pX-15 pY-15 bgc-green-50 c-green-500"></span></div>
                                           </div>
                                        </div>
                                     {% else %}
@@ -117,41 +117,28 @@
 
                                  </div>
                               </div>
-                              <div class="col-md-3">
+                              <div class="col-md-4">
                                  <div class="layers bd bgc-white p-20">
                                     <div class="layer w-100 mB-10">
-                                       <h6 class="lh-1">Map on Route</h6>
+                                       <h6 class="lh-1">En Yoğun Saat Lokasyon Sayısı</h6>
                                     </div>
                                     <div class="layer w-100">
                                        <div class="peers ai-sb fxw-nw">
                                           <div class="peer peer-greed"><span id="sparklinedash2"></span></div>
-                                          <div class="peer"><span id="route_on_map_class2"class="route_on_map_class2 d-ib lh-0 va-m fw-600 bdrs-10em pX-15 pY-15 bgc-red-50 c-red-500">{{ route_count }}</span></div>
+                                          <div class="peer"><span id="total_point_class" class="total_point_class d-ib lh-0 va-m fw-600 bdrs-10em pX-15 pY-15 bgc-red-50 c-red-500"></span></div>
                                        </div>
                                     </div>
                                  </div>
                               </div>
-                              <div class="col-md-3">
+                              <div class="col-md-4">
                                  <div class="layers bd bgc-white p-20">
                                     <div class="layer w-100 mB-10">
-                                       <h6 class="lh-1">Total Routes</h6>
-                                    </div>
-                                    <div class="layer w-100">
-                                       <div class="peers ai-sb fxw-nw">
-                                          <div class="peer peer-greed"><span id="sparklinedash2"></span></div>
-                                          <div class="peer"><span id="route_on_map_class" class="route_on_map_class d-ib lh-0 va-m fw-600 bdrs-10em pX-15 pY-15 bgc-red-50 c-red-500">{{ route_count }}</span></div>
-                                       </div>
-                                    </div>
-                                 </div>
-                              </div>
-                              <div class="col-md-3">
-                                 <div class="layers bd bgc-white p-20">
-                                    <div class="layer w-100 mB-10">
-                                       <h6 class="lh-1">Total Locations</h6>
+                                       <h6 class="lh-1">Toplam Lokasyon Sayısı</h6>
                                     </div>
                                     <div class="layer w-100">
                                        <div class="peers ai-sb fxw-nw">
                                           <div class="peer peer-greed"><span id="sparklinedash3"></span></div>
-                                          <div class="peer"><span id="point_count_class"class="point_count_class d-ib lh-0 va-m fw-600 bdrs-10em pX-15 pY-15 bgc-purple-50 c-purple-500">{{ point_count }}</span></div>
+                                          <div class="peer"><span class="d-ib lh-0 va-m fw-600 bdrs-10em pX-15 pY-15 bgc-purple-50 c-purple-500">{{ point_count }}</span></div>
                                        </div>
                                     </div>
                                  </div>
@@ -165,7 +152,7 @@
                               <div class="peer bdL p-20 w-40p@lg+ w-100p@lg-">
                                
                               <h6 class="c-grey-900">Selected Point</h6>
-                              <form id="search-form" action="/locations">
+                              <form id="search-form-busy" action="/density">
                                  <div class="mT-30">                                
                                     <div class="form-row">
                                        <div class="form-group col-md-6"><label for="lat">Latitude</label><input type="text" class="form-control" disabled="" id="lat"></div>
@@ -215,33 +202,6 @@
                            </div>
                         </div>  
                      </div>
-                     
-                     <div class="masonry-item col-md-12">
-                        <div class="bd bgc-white">
-                           <div class="layers">
-                              <div class="layer w-100 p-20">
-                                 <h6 class="lh-1">Route List</h6>
-                              </div>
-                              <div class="layer w-100">
-                                 <div class="table p-20" id="table-div">
-                                    <table class="table" id="table">
-                                       <thead>
-                                          <tr>
-                                             <th class="bdwT-0">Name</th>
-                                             <th class="bdwT-0">Status</th>
-                                             <th class="bdwT-0">Date</th>
-                                             <th class="bdwT-0">Price</th>
-                                          </tr>
-                                       </thead>
-                                    
-                                    </table>
-                                 </div>
-                              </div>
-                           </div>
-                           <!-- <div class="ta-c bdT w-100 p-20"><a href="#">Check all the sales</a></div> -->
-                        </div>
-                     </div>
-                     
                   </div>
                </div>
             </main>
@@ -266,11 +226,12 @@
    <script src="{% static 'jquery.datetimepicker.js' %}"></script>
    <script>
 console.log("                    ___\n                _.-'   ```'--.._                 _____ ___ ___   ____  _____ __ __      ______  __ __    ___  \n              .'                `-._            / ___/|   |   | /    |/ ___/|  |  |    |      ||  |  |  /  _] \n             /                      `.         (   \\_ | _   _ ||  o  (   \\_ |  |  |    |      ||  |  | /  [_        \n            /                         `.        \\__  ||  \\_/  ||     |\\__  ||  _  |    |_|  |_||  _  ||    _]       \n           /                            `.      /  \\ ||   |   ||  _  |/  \\ ||  |  |      |  |  |  |  ||   [_        \n          :       (                       \\     \\    ||   |   ||  |  |\\    ||  |  |      |  |  |  |  ||     |       \n          |    (   \\_                  )   `.    \\___||___|___||__|__| \\___||__|__|      |__|  |__|__||_____|       \n          |     \\__/ '.               /  )  ;  \n          |   (___:    \\            _/__/   ;    ____   ____  ______  ____   ____   ____  ____      __  __ __  __ __ \n          :       | _  ;          .'   |__) :   |    \\ /    ||      ||    \\ |    | /    ||    \\    /  ]|  |  ||  |  |\n           :      |` \\ |         /     /   /    |  o  )  o  ||      ||  D  ) |  | |  o  ||  D  )  /  / |  |  ||  |  |\n            \\     |_  ;|        /`\\   /   /     |   _/|     ||_|  |_||    /  |  | |     ||    /  /  /  |  _  ||  ~  |\n             \\    ; ) :|       ;_  ; /   /      |  |  |  _  |  |  |  |    \\  |  | |  _  ||    \\ /   \\_ |  |  ||___, |\n              \\_  .-''-.       | ) :/   /       |  |  |  |  |  |  |  |  .  \\ |  | |  |  ||  .  \\\\     ||  |  ||     |\n             .-         `      .--.'   /        |__|  |__|__|  |__|  |__|\\_||____||__|__||__|\\_| \\____||__|__||____/ \n            :         _.----._     `  < \n            :       -'........'-       `.\n             `.        `''''`           ;\n               `'-.__                  ,'\n                     ``--.   :'-------'\n                         :   :\n                        .'   '.\n      \n      \n                                                                    ");
+      console.log("sa")
       var is_superuser = "{{ user.is_superuser }}";
       var user = "{{ user }}"
-      var groups = JSON.parse('{{ groups|safe }}');
-      var table_data = Array()
-      var route_filter = null;
+      var points = JSON.parse('{{ points|safe }}');
+      points = points.points
+
       var colorArray = [
         "#ffd700",
         "#ffc0cb",        
@@ -314,7 +275,6 @@ console.log("                    ___\n                _.-'   ```'--.._          
       var LatestLong = null;
       var marker;
       var map = L.map('mapid', {renderer: L.canvas()}).setView([41.0697, 28.934], 10);
-      var polylines = null;
       var circleMarkers = null;
 
       var from_date = $('#from_date').datetimepicker();
@@ -325,83 +285,40 @@ console.log("                    ___\n                _.-'   ```'--.._          
       }).addTo(map);
       const waypoints = []
 
-      if (groups) {
-         draw_routes(groups);
-         draw_table(groups);
+      if (points) {
+         draw_routes(points);
       }
-
-    function draw_routes(locations) {
+    function getRandomInt(max) {
+         return Math.floor(Math.random() * Math.floor(max));
+    }
+    function draw_routes(points) {
       let lat;
       let long;
       let location;
       let color_array_index = 0 
-      polylines = new L.FeatureGroup();
+      let _co_color = 0
       circleMarkers = new L.FeatureGroup()
-      var polyline = null
-      for (const [key, value] of Object.entries(locations)) {
-        route_locations = value;
-        let latlngs = Array();
-        let i = 1;
-
-        // Begining of the route
-        let lat = route_locations[0]["latitude"];
-        let long = route_locations[0]["longitude"];
-        let circleMarkerFirst = L.circleMarker([lat, long], {
+      for (i = 1; i < points.length-1; i++) {
+          color_array_index = getRandomInt(20);
+          co_color = colorArray[color_array_index];
+          point = points[i];
+          lat = point["latitude"];
+          long = point["longitude"];
+         let circleMarkerFirst = L.circleMarker([lat, long], {
             "radius": 4,
-            "fillColor": colorArray[color_array_index],
-            "color": colorArray[color_array_index],
+            "fillColor": co_color,
+            "color": co_color,
             "weight": 2,
             "opacity": 0.7,
-          })
-        circleMarkerFirst.addTo(circleMarkers)
-        for (i = 1; i < route_locations.length-1; i++) {
-          route_location = route_locations[i];
-          lat = route_location["latitude"];
-          long = route_location["longitude"];
-          let position = new  L.Marker([lat, long]); // set
-          latlngs.push(position.getLatLng());
+          }).bindPopup(point["username"] + ": " + point["route_id"])
+          circleMarkerFirst.addTo(circleMarkers)
         }
+      circleMarkers.addTo(map);
+      map.fitBounds(circleMarkers.getBounds());
 
-        // End of the route
-        lat = route_locations[route_locations.length-1]["latitude"];
-        long = route_locations[route_locations.length-1]["longitude"];
-        let circleMarkerLast = L.circleMarker([lat, long], {
-            "radius": 5,
-            "fillColor": colorArray[color_array_index],
-            "color": colorArray[color_array_index],
-            "weight": 6,
-            "opacity": 1,
-          })
-        circleMarkerLast.addTo(circleMarkers);
 
-        circleMarkers.addTo(map);
-
-        let bind_text = route_locations[0].route_id
-        if (is_superuser == "True") {
-         bind_text = route_locations[0].username + ": " + bind_text;
-        }
-
-        polyline = L.polyline(latlngs, {route_id:route_locations[0].route_id, color: colorArray[color_array_index]}).bindPopup(bind_text);
-        polyline.on('click', function () {
-          map.fitBounds(this.getBounds());
-          route_filter = this.options['route_id']
-        });
-
-        polyline.addTo(polylines)
-        color_array_index++;
-        table_data[route_locations[0].route_id] = polyline;
-        if (table_data[route_locations[0].username] == undefined) {
-            table_data[route_locations[0].username] = {"circleMarkers": [], "polylines": []}
-        }
-        table_data[route_locations[0].username]["polylines"].push(polyline);
-        table_data[route_locations[0].username]["circleMarkers"].push(circleMarkerFirst);
-        table_data[route_locations[0].username]["circleMarkers"].push(circleMarkerLast);
-      }
-      polylines.addTo(map)
-      map.fitBounds(polylines.getBounds())
     }
     let circle = null
-
     function clean_map(keep_point) {
       map.eachLayer(function (layer) {
           if (layer instanceof L.Marker) {
@@ -419,73 +336,9 @@ console.log("                    ___\n                _.-'   ```'--.._          
       let radius_text = document.getElementById("radius_text")
       radius.setAttribute('value', 0);
       radius_text.setAttribute('value', "0KM");
-
-      if (polylines) {
-        map.removeLayer(polylines);
-      }
       if (circleMarkers) {
         map.removeLayer(circleMarkers);
       }
-    }
-
-    function focus_polyline(key) {
-      let poly = table_data[key];
-      if (poly["circleMarkers"] != undefined) {
-         clean_map()
-         polylines = new L.FeatureGroup();
-         circleMarkers = new L.FeatureGroup();
-         for (var i = 0; i < poly["polylines"].length; i++) {
-            poly["polylines"][i].addTo(polylines);
-         }
-         for (var i = 0; i < poly["circleMarkers"].length; i++) {
-            poly["circleMarkers"][i].addTo(circleMarkers);
-         }
-         polylines.addTo(map);
-         circleMarkers.addTo(map);
-         map.fitBounds(polylines.getBounds());
-         route_filter = null;
-      } else {
-         map.fitBounds(poly.getBounds());
-         route_filter = key;
-      }
-
-       
-    }
-
-    function draw_table(data, polyline_data) {
-      var div = document.getElementById("table-div");
-      div.innerHTML = "<table class='table' id='table'>" +
-        '<thead> ' +
-        '  <tr> ' +
-        '    <th scope="col">#</th>' +
-        '    <th scope="col">User</th>' +
-        '    <th scope="col">Route</th>' +
-        '  </tr>' +
-        '</thead>' +
-        '<tbody>'
-      var i = 0;
-      var table_rows = "";
-      for (const [key, value] of Object.entries(data)) {
-        i++;
-        let username = value[0]['username'];
-        let route_id = value[0]['route_id'];
-        let username_html = '"' + username + '"';
-        let route_id_html = '"' + route_id + '"';
-
-        table_rows += "<tr><th scope='row' class='fw-600'>" + i + "</th>"+" <td><a href='javascript:void(0);' onclick='focus_polyline("+ username_html + ");'>"+ username +"</a></td>"+"<td><a href='javascript:void(0);' onclick='focus_polyline("+ route_id_html + ");'>"+ route_id +"</a></td></tr>";
-        // div.innerHTML += '<tr>' +
-        //     '<th scope="row">'+ i +'</th>' +
-        //     '<td>'+ user +'</td>' +
-        //     '<td>'+ route_id +'</td>' +
-        //   '</tr>'
-      }
-      $(table).find('tbody').append(table_rows);
-      div.innerHTML += "</tbody></table>"
-    }
-
-    function clean_table() {
-      var Parent = document.getElementById("table-div").innetHTML = "";
-
     }
 
     $("#radius").on("action input change", function(e) {
@@ -535,10 +388,10 @@ console.log("                    ___\n                _.-'   ```'--.._          
         }
     });
     // this is the id of the form
-    $("#search-form").submit(function(e) {
+    $("#search-form-busy").submit(function(e) {
         e.preventDefault(); // avoid to execute the actual submit of the form.
         var form = $(this);
-        var data = form.serialize() + '&lat=' + LatestLat +'&lng=' + LatestLong + '&route_filter=' + route_filter
+        var data = form.serialize() + '&lat=' + LatestLat +'&lng=' + LatestLong
         var url = form.attr('action');
         $.ajax({
                type: "GET",
@@ -547,22 +400,17 @@ console.log("                    ___\n                _.-'   ```'--.._          
 
                success: function(data)
                {
-
                 clean_map(keep_point=marker);
-                clean_table()
-                console.log(data);
-                let my_len = Object.keys(data).length;
-                let point_count_element = document.getElementById('point_count_class');
-                point_count_element.innerHTML = my_len * 137;
-                let route_on_map_element = document.getElementById('route_on_map_class');
-                route_on_map_element.innerHTML = my_len
-                let route_on_map_element2 = document.getElementById('route_on_map_class2');
-                route_on_map_element2.innerHTML = my_len
+                let date_range = data['date_range'];
+                let point_data = data['data'];
+                point_data = JSON.parse(point_data);
+                 let date_range_element = document.getElementById('date_range_class');
+                 let total_point_class = document.getElementById('total_point_class');
+                 date_range_element.innerHTML = date_range["key"]
+                 total_point_class.innerHTML = date_range["count"]
 
-                draw_routes(data);
-
-                draw_table(data);
-                route_filter = null;
+                console.log(date_range)
+                draw_routes(point_data["queryset"]);
                }
              });
     });
