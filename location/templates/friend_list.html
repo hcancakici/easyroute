@@ -1,20 +1,20 @@
-
-{% block content %}
-
 {% load static %}
-  <h5>Your friends</h5>
-  {% for friend in friend_list %}
-    <li> {{friend}} </li>
-  {% endfor %}
 
+<!DOCTYPE html>
+<html>
+   <head>
+      <title>Dashboard</title>
+      <style>#loader{transition:all .3s ease-in-out;opacity:1;visibility:visible;position:fixed;height:100vh;width:100%;background:#fff;z-index:90000}#loader.fadeOut{opacity:0;visibility:hidden}.spinner{width:40px;height:40px;position:absolute;top:calc(50% - 20px);left:calc(50% - 20px);background-color:#333;border-radius:100%;-webkit-animation:sk-scaleout 1s infinite ease-in-out;animation:sk-scaleout 1s infinite ease-in-out}@-webkit-keyframes sk-scaleout{0%{-webkit-transform:scale(0)}100%{-webkit-transform:scale(1);opacity:0}}@keyframes sk-scaleout{0%{-webkit-transform:scale(0);transform:scale(0)}100%{-webkit-transform:scale(1);transform:scale(1);opacity:0}}</style>
+      <link href="./style.css" rel="stylesheet">
+          <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
 
-
-  <h5>People Added You as Friend</h5>
-  {% for friend in user_friends %}
-    <li> {{friend}} </li>
-  {% endfor %}
-
-
+    <link rel="stylesheet" type="text/css" href="{% static 'jquery.datetimepicker.css' %}"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+    <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+   </head>
    <body class="app">
       <div id="loader">
          <div class="spinner"></div>
@@ -26,23 +26,111 @@
          }, 300);
          });
       </script>
-      <div class="peers ai-s fxw-nw h-100vh">
-         <div class="col-12 col-md-4 peer pX-40 pY-80 h-100 bgc-white scrollable pos-r" style="min-width:320px">
-            <form action="{% url 'friend-list-detail' %}" method="POST">
-                {% csrf_token %}
-               <div class="form-group"><label class="text-normal text-dark">Username</label><input type="text" class="form-control" name="username" id="username" placeholder="John Doe"></div>
-               <div class="form-group">
-                  <div class="peers ai-c jc-sb fxw-nw">
-                     <div class="peer">
+      <div>
+         <div class="sidebar">
+            <div class="sidebar-inner">
+               <div class="sidebar-logo">
+                  <div class="peers ai-c fxw-nw">
+                     <div class="peer peer-greed">
+                        <a class="sidebar-link td-n" href="https://colorlib.com/polygon/adminator/index.html" class="td-n">
+                           <div class="peers ai-c fxw-nw">
+                              <div class="peer">
+                                 <div class="logo"><img src="assets/static/images/logo.png" alt=""></div>
+                              </div>
+                              <div class="peer peer-greed">
+                                 <h5 class="lh-1 mB-0 logo-text">EasyRoute</h5>
+                              </div>
+                           </div>
+                        </a>
                      </div>
-                     <input type="submit" value="Add-Remove Friend" />
+                     <div class="peer">
+                        <div class="mobile-toggle sidebar-toggle"><a href="" class="td-n"><i class="ti-arrow-circle-left"></i></a></div>
+                     </div>
                   </div>
                </div>
-            </form>
+               <ul class="sidebar-menu scrollable pos-r">
+                  <li class="nav-item mT-30 active"><a class="sidebar-link" href="/locations/map/" default><span class="icon-holder"><i class="c-blue-500 ti-home"></i> </span><span class="title">Dashboard</span></a></li>
+                  <li class="nav-item"><a class="sidebar-link" href="{% url 'friend-list-detail' %}"><span class="icon-holder"><i class="c-brown-500 ti-comment-alt"></i> </span><span class="title">Friends</span></a></li>
+                  <li class="nav-item"><a class="sidebar-link" href="{% url 'busy-view' %}"><span class="icon-holder"><i class="c-brown-500 ti-map"></i> </span><span class="title">Density Map</span></a></li>
+                  <li class="nav-item dropdown">
+                     <a class="dropdown-toggle" href="javascript:void(0);"><span class="icon-holder"><i class="c-orange-500 ti-layout-list-thumb"></i> </span><span class="title">Tables</span> <span class="arrow"><i class="ti-angle-right"></i></span></a>
+                     <ul class="dropdown-menu">
+                        <li><a class="sidebar-link" href="basic-table.html">Basic Table</a></li>
+                        <li><a class="sidebar-link" href="datatable.html">Data Table</a></li>
+                     </ul>
+                  </li>
+               </ul>
+            </div>
+         </div>
+         <div class="page-container">
+            <div class="header navbar">
+               <div class="header-container">
+                  <ul class="nav-left">
+                     <li><a id="sidebar-toggle" class="sidebar-toggle" href="javascript:void(0);"><i class="ti-menu"></i></a></li>
+                     <li class="search-box"><a class="search-toggle no-pdd-right" href="javascript:void(0);"><i class="search-icon ti-search pdd-right-10"></i> <i class="search-icon-close ti-close pdd-right-10"></i></a></li>
+                     <li class="search-input"><input class="form-control" type="text" placeholder="Search..."></li>
+                  </ul>
+                  <ul class="nav-right">
+                     
+                     <li class="dropdown">
+                        <a href="" class="dropdown-toggle no-after peers fxw-nw ai-c lh-1" data-toggle="dropdown">
+                           <div class="peer"><span class="fsz-sm c-grey-900">{{ user }}</span></div>
+                        </a>
+                        <ul class="dropdown-menu fsz-sm">
+                           <li><a href="{% url 'friend-list-detail'%}" class="d-b td-n pY-5 bgcH-grey-100 c-grey-700"><i class="ti-email mR-10"></i> <span>Arkadaş Yönetimi</span></a></li>
+                           <li role="separator" class="divider"></li>
+                           <li><a href="{% url 'logout' %}" class="d-b td-n pY-5 bgcH-grey-100 c-grey-700"><i class="ti-power-off mR-10"></i> <span>Logout</span></a></li>
+                        </ul>
+                     </li>
+                  </ul>
+               </div>
+            </div>
+            <main class="main-content bgc-grey-100">
+              {% block content %}
+
+                 <h5>Your friends</h5>
+                 {% for friend in friend_list %}
+                   <li> {{friend}} </li>
+                 {% endfor %}
+
+                 <h5>People Added You as Friend</h5>
+                 {% for friend in user_friends %}
+                   <li> {{friend}} </li>
+                 {% endfor %}
+
+
+                  <body class="app">
+                     <div class="peers ai-s fxw-nw h-100vh">
+                        <div class="col-12 col-md-4 peer pX-40 pY-80 h-100 bgc-white scrollable pos-r" style="min-width:320px">
+                           <form action="{% url 'friend-list-detail' %}" method="POST">
+                               {% csrf_token %}
+                              <div class="form-group"><label class="text-normal text-dark">Username</label><input type="text" class="form-control" name="username" id="username" placeholder="John Doe"></div>
+                              <div class="form-group">
+                                 <div class="peers ai-c jc-sb fxw-nw">
+                                    <div class="peer">
+                                    </div>
+                                    <input class="btn btn-primary" type="submit" value="Add-Remove Friend" />
+                                 </div>
+                              </div>
+                           </form>
+                        </div>
+                     </div>
+                        <script type="text/javascript" src="{% static 'vendor.js' %}"></script>
+                        <script type="text/javascript" src="{% static 'bundle.js' %}"></script>
+                  </body>
+
+               {% endblock %}
+            </main>
+
          </div>
       </div>
-         <script type="text/javascript" src="{% static 'vendor.js' %}"></script>
-         <script type="text/javascript" src="{% static 'bundle.js' %}"></script>
+      
    </body>
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+   <script type="text/javascript" src="{% static 'vendor.js' %}"></script>
+   <script type="text/javascript" src="{% static 'bundle.js' %}"></script>
+   <script src="{% static 'jquery.datetimepicker.js' %}"></script>
+   <script>
+</script>
+</html>
 
-{% endblock %}
