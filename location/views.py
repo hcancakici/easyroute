@@ -265,7 +265,7 @@ class FriendListViewSet(generics.ListAPIView):
         try:
             f_list = FriendList.objects.get(username=request.user.username)
         except:
-            f_list = FriendList.objects.create(username=username, friend_list=[])
+            f_list = FriendList.objects.create(username=request.user.username, friend_list=[])
 
         if username not in f_list.friend_list:
             f_list.friend_list.append(username)
