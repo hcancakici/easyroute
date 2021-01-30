@@ -94,7 +94,7 @@ DATABASES = {
     }
 }
 
-LOGIN_REDIRECT_URL = '/locations'
+LOGIN_REDIRECT_URL = '/locations/map/'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 
 
