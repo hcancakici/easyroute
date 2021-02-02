@@ -237,7 +237,6 @@ class MapViewSet(generics.ListAPIView):
         for route in routes:
             from rest_framework.renderers import JSONRenderer
             groups[route] = json.loads(JSONRenderer().render(LocationListSerializer(Location.objects.filter(route_id=route), many=True).data))
-            print(type(groups[route]))
 
         return groups
 
@@ -434,10 +433,9 @@ class LocationBusyViewSet(viewsets.ModelViewSet):
         queryset = self.get_queryset()
         date_range = self._get_busy_date(queryset)
         from rest_framework.renderers import JSONRenderer
-        queryset = {"queryset": json.loads(JSONRenderer().render(LocationListSerializer(queryset, many=True).data))}
-        queryset = json.dumps(queryset)
+        queryset = json.loads(JSONRenderer().render(LocationListSerializer(queryset, many=True).data))
 
-        return Response({"data": queryset, "date_range": date_range})
+        return JsonResponse({"data": queryset, "date_range": date_range}, safe=True)
 
     def _get_busy_date(self, queryset):
         hour_multiplier = 2

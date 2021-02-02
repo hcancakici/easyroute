@@ -91,33 +91,32 @@
                      <div class="masonry-sizer col-md-6"></div>
                         <div class="masonry-item w-100">
                            <div class="row gap-20">
-                              <div class="col-md-4">
+                              <div class="col-md-3">
                                  <div class="layers bd bgc-white p-20">
-                                    {% if user.is_superuser %}
-                                       <div class="layer w-100 mB-10">
-                                          <h6 class="lh-1">En Yoğun Saat</h6>
+                                    <div class="layer w-100 mB-10">
+                                       <h6 class="lh-1">Username</h6>
+                                    </div>
+                                    <div class="layer w-100">
+                                       <div class="peers ai-sb fxw-nw">
+                                          <div class="peer"><span class="d-ib lh-0 va-m fw-600 bdrs-10em pX-15 pY-15 bgc-green-50 c-green-500">{{ user.username }}</span></div>
                                        </div>
-                                       <div class="layer w-100">
-                                          <div class="peers ai-sb fxw-nw">
-                                             <div class="peer peer-greed"><span id="sparklinedash"></span></div>
-                                             <div class="peer"><span id="date_range_class" class="date_range_class d-ib lh-0 va-m fw-600 bdrs-10em pX-15 pY-15 bgc-green-50 c-green-500"></span></div>
-                                          </div>
-                                       </div>
-                                    {% else %}
-                                       <div class="layer w-100 mB-10">
-                                          <h6 class="lh-1">Username</h6>
-                                       </div>
-                                       <div class="layer w-100">
-                                          <div class="peers ai-sb fxw-nw">
-                                             <div class="peer"><span class="d-ib lh-0 va-m fw-600 bdrs-10em pX-15 pY-15 bgc-green-50 c-green-500">{{ user.username }}</span></div>
-                                          </div>
-                                       </div>
-
-                                    {% endif %}
-
+                                    </div>
                                  </div>
                               </div>
-                              <div class="col-md-4">
+                              <div class="col-md-3">
+                                 <div class="layers bd bgc-white p-20">
+                                    <div class="layer w-100 mB-10">
+                                       <h6 class="lh-1">En Yoğun Saat</h6>
+                                    </div>
+                                    <div class="layer w-100">
+                                       <div class="peers ai-sb fxw-nw">
+                                          <div class="peer peer-greed"><span id="sparklinedash"></span></div>
+                                          <div class="peer"><span id="date_range_class" class="date_range_class d-ib lh-0 va-m fw-600 bdrs-10em pX-15 pY-15 bgc-green-50 c-green-500"></span></div>
+                                       </div>
+                                    </div>
+                                 </div>
+                              </div>
+                              <div class="col-md-3">
                                  <div class="layers bd bgc-white p-20">
                                     <div class="layer w-100 mB-10">
                                        <h6 class="lh-1">En Yoğun Saat Lokasyon Sayısı</h6>
@@ -130,7 +129,7 @@
                                     </div>
                                  </div>
                               </div>
-                              <div class="col-md-4">
+                              <div class="col-md-3">
                                  <div class="layers bd bgc-white p-20">
                                     <div class="layer w-100 mB-10">
                                        <h6 class="lh-1">Toplam Lokasyon Sayısı</h6>
@@ -163,11 +162,10 @@
                                  <div class="mT-30">
                                     
                                     <div class="form-row">
-                                       <div class="form-group col-md-6"><label for="from_date">From Date</label><input name="from_date" type="datetime" class="form-control from_date" id="from_date" ></div>
-                                       <div class="form-group col-md-6"><label for="to_date">To Date</label><input name="to_date" type="datetime" class="form-control to_date" id="to_date" ></div>
+                                       <div class="form-group col-md-6"><label for="from_date">From Date</label><input required="true" name="from_date" type="datetime" class="form-control from_date" id="from_date" ></div>
+                                       <div class="form-group col-md-6"><label for="to_date">To Date</label><input required="true" name="to_date" type="datetime" class="form-control to_date" id="to_date" ></div>
                                     </div>
                                     
-                                    <div class="form-group"><label for="knn">KNN Search</label><input name="knn" type="text" class="form-control knn" id="knn"></div>
                                     <div class="form-group"><label for="radius">Radius</label><input name="radius" type="range" class="radius form-control"  max="200" min="0" id="radius"><input type="text" name="radius_text" class="radius_text form-control" id="radius_text" placeholder=""  disabled="disabled"></div>
                                     
                                     {% if user.is_superuser %}
@@ -181,7 +179,7 @@
                                              </select>
                                           </div>
                                     {% endif %}
-                                       <div class="form-group">
+                                       <!---<div class="form-group">
                                           <label for="User Search">Friend Filter</label>
                                           <select id="friend_name" name="friend_name" class="form-control">
                                             <option value="" selected>None</option>
@@ -189,7 +187,7 @@
                                               <option value="{{ temp_user }}">{{ temp_user }}</option>
                                             {% endfor %}
                                           </select>
-                                       </div>
+                                       </div>-->
                                        <div class="form-group">
                                           <button type="reset" class="btn btn-gray col-md-5" onclick="clean_map()">Clear</button>
                                           <button type="submit" class="btn btn-primary col-md-6">Search</button>
@@ -323,7 +321,7 @@ console.log("                    ___\n                _.-'   ```'--.._          
             map.removeLayer(layer);
           }
       });
-      if (keep_point) {
+      if (keep_point && LatestLong != undefined && LatestLat != undefined) {
           marker = new L.Marker([LatestLat, LatestLong]);
           map.addLayer(marker);
       }
@@ -401,14 +399,13 @@ console.log("                    ___\n                _.-'   ```'--.._          
                 clean_map(keep_point=marker);
                 let date_range = data['date_range'];
                 let point_data = data['data'];
-                point_data = JSON.parse(point_data);
                  let date_range_element = document.getElementById('date_range_class');
                  let total_point_class = document.getElementById('total_point_class');
                  date_range_element.innerHTML = date_range["key"]
                  total_point_class.innerHTML = date_range["count"]
 
                 console.log(date_range)
-                draw_routes(point_data["queryset"]);
+                draw_routes(point_data);
                }
              });
     });
