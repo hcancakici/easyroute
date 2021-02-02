@@ -52,16 +52,11 @@
                   <li class="nav-item mT-30 active"><a class="sidebar-link" href="/locations/map/" default><span class="icon-holder"><i class="c-blue-500 ti-home"></i> </span><span class="title">Dashboard</span></a></li>
                   <li class="nav-item"><a class="sidebar-link" href="{% url 'friend-list-detail' %}"><span class="icon-holder"><i class="c-brown-500 ti-comment-alt"></i> </span><span class="title">Friends</span></a></li>
                   <li class="nav-item"><a class="sidebar-link" href="{% url 'busy-view' %}"><span class="icon-holder"><i class="c-brown-500 ti-map"></i> </span><span class="title">Density Map</span></a></li>
-                  <li class="nav-item dropdown">
-                     <a class="dropdown-toggle" href="javascript:void(0);"><span class="icon-holder"><i class="c-orange-500 ti-layout-list-thumb"></i> </span><span class="title">Tables</span> <span class="arrow"><i class="ti-angle-right"></i></span></a>
-                     <ul class="dropdown-menu">
-                        <li><a class="sidebar-link" href="basic-table.html">Basic Table</a></li>
-                        <li><a class="sidebar-link" href="datatable.html">Data Table</a></li>
-                     </ul>
-                  </li>
+                  
                </ul>
             </div>
          </div>
+
          <div class="page-container">
             <div class="header navbar">
                <div class="header-container">
@@ -85,6 +80,82 @@
                   </ul>
                </div>
             </div>
+            {% block content2 %}
+            <main class="main-content bgc-grey-100">
+                    <div id="mainContent">
+                        <div class="row gap-20 masonry pos-r">
+                            <div class="masonry-sizer col-md-4"></div>
+                            <div class="masonry-item col-md-4">
+                                <div class="bgc-white p-20 bd">
+                                    <h6 class="c-grey-900">Your Friends</h6>
+                                    <!-- <div class="mT-30"> -->
+                                    <div class="layer w-100">
+                                     <div class="table p-20" id="table-div">
+                                        <table class="table table" id="table">
+                                           <thead>
+                                              <tr>
+                                                 <th class="bdwT-0">#</th>
+                                                 <th class="bdwT-0">Friend</th>
+                                              </tr>
+                                              
+                                           </thead>
+                                           <tbody>
+                                             {% for friend in friend_list %}
+                                                <tr>
+                                                  <td>{{forloop.counter}}</td>
+                                                  <td>{{friend}}</td>
+                                                </tr>
+                                              {% endfor %}
+                                            </tbody>
+                                        </table>
+                                     </div>
+                                  </div>
+                                    <!-- </div> -->
+                                </div>
+                            </div>
+                            <div class="masonry-item col-md-4">
+                                <div class="bgc-white p-20 bd">
+                                    <h6 class="c-grey-900">People Added You as Friend</h6>
+                                    <div class="layer w-100">
+                                     <div class="table p-20" id="table-div">
+                                        <table class="table table" id="table">
+                                            <thead>
+                                              <tr>
+                                                 <th class="bdwT-0">#</th>
+                                                 <th class="bdwT-0">Friend</th>
+                                              </tr>
+                                            </thead>
+                                            <tbody>
+                                           {% for friend in user_friends %}
+                                              <tr>
+                                                <td>{{forloop.counter}}</td>
+                                                <td>{{friend}}</td>
+                                              </tr>
+                                            {% endfor %}
+                                            </tbody>
+                                        </table>
+                                     </div>
+                                  </div>
+                                </div>
+                            </div>
+                            <div class="masonry-item col-md-4">
+                                <div class="bgc-white p-20 bd">
+                                    <h6 class="c-grey-900">Add Friends</h6>
+                                    <div class="mT-30">
+                                        <form action="{% url 'friend-list-detail' %}" method="POST">
+                                        {% csrf_token %}
+                                            <div class="form-group"><label for="inputAddress">Username</label><input type="text" class="form-control" id="username" name="username" /></div>
+                                            <button type="submit" class="btn btn-primary">Add Friend</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            {% endblock %}
+
+            <!-- 
             <main class="main-content bgc-grey-100">
               {% block content %}
 
@@ -120,7 +191,7 @@
                   </body>
 
                {% endblock %}
-            </main>
+            </main> -->
 
          </div>
       </div>
