@@ -397,14 +397,16 @@ console.log("                    ___\n                _.-'   ```'--.._          
                success: function(data)
                {
                 clean_map(keep_point=marker);
+                if (circle) {
+                  circle.addTo(map);
+                }
                 let date_range = data['date_range'];
                 let point_data = data['data'];
-                 let date_range_element = document.getElementById('date_range_class');
-                 let total_point_class = document.getElementById('total_point_class');
-                 date_range_element.innerHTML = date_range["key"]
-                 total_point_class.innerHTML = date_range["count"]
+                let date_range_element = document.getElementById('date_range_class');
+                let total_point_class = document.getElementById('total_point_class');
+                date_range_element.innerHTML = date_range["key"]
+                total_point_class.innerHTML = date_range["count"]
 
-                console.log(date_range)
                 draw_routes(point_data);
                }
              });
