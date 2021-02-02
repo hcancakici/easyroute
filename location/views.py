@@ -9,6 +9,8 @@ from django.contrib.gis.measure import Distance
 from django.contrib.gis.db.models.functions import Distance as func_Distance
 
 from django.http import HttpResponse
+from django.http import JsonResponse
+
 
 from rest_framework import viewsets, generics
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
@@ -454,7 +456,12 @@ class LocationBusyViewSet(viewsets.ModelViewSet):
                 print(e)
                 return key
         if to_date:
-            to_date = datetime.datetime.strptime(to_date, '%Y/%m/%d %H:%M')
+            try:
+                to_date = datetime.datetime.strptime(to_date, '%Y/%m/%d %H:%M')
+            except Exception as e:
+                print(e)
+                return key
+
         elif from_date:
             to_date = from_date + date_range_fiter
 
@@ -524,3 +531,21 @@ class MapBusyViewSet(generics.ListAPIView):
         if request.user.is_superuser:
             return User.objects.all().values_list("username", flat=True)
         return FriendList.objects.filter(friend_list__contains=[request.user.username]).values_list("username", flat=True) or []
+
+
+def get_user_route_count(request):
+    point_count = 0
+    route_count = 0
+
+    if request.method == 'GET' and request.user:
+        try:
+            if request.user.is_superuser:
+                locs = Location.objects.filter(is_active=True)
+            else:
+                locs = Location.objects.filter(username=request.user.username, is_active=True)
+            route_count = len(set(locs.values_list("route_id", flat=True)))
+            point_count = locs.count()
+        except Exception as e:
+            print(e)
+
+    return JsonResponse({"point_count": point_count, "route_count": route_count})

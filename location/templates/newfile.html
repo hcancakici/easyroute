@@ -125,7 +125,7 @@
                                     <div class="layer w-100">
                                        <div class="peers ai-sb fxw-nw">
                                           <div class="peer peer-greed"><span id="sparklinedash2"></span></div>
-                                          <div class="peer"><span id="route_on_map_class2"class="route_on_map_class2 d-ib lh-0 va-m fw-600 bdrs-10em pX-15 pY-15 bgc-red-50 c-red-500">0</span></div>
+                                          <div class="peer"><span id="route_on_map_class"class="route_on_map_class d-ib lh-0 va-m fw-600 bdrs-10em pX-15 pY-15 bgc-red-50 c-red-500">{{route_on_map}}</span></div>
                                        </div>
                                     </div>
                                  </div>
@@ -138,7 +138,7 @@
                                     <div class="layer w-100">
                                        <div class="peers ai-sb fxw-nw">
                                           <div class="peer peer-greed"><span id="sparklinedash2"></span></div>
-                                          <div class="peer"><span id="route_on_map_class" class="route_on_map_class d-ib lh-0 va-m fw-600 bdrs-10em pX-15 pY-15 bgc-red-50 c-red-500">{{ route_count }}</span></div>
+                                          <div class="peer"><span id="total_route_count_element" class="total_route_count_element d-ib lh-0 va-m fw-600 bdrs-10em pX-15 pY-15 bgc-red-50 c-red-500">{{ route_count }}</span></div>
                                        </div>
                                     </div>
                                  </div>
@@ -545,20 +545,27 @@ console.log("                    ___\n                _.-'   ```'--.._          
                {
 
                 clean_map(keep_point=marker);
+                if (circle){
+                  circle.addTo(map)
+                }
+
                 clean_table()
-                console.log(data);
                 let my_len = Object.keys(data).length;
-                let point_count_element = document.getElementById('point_count_class');
-                point_count_element.innerHTML = my_len * 137;
                 let route_on_map_element = document.getElementById('route_on_map_class');
                 route_on_map_element.innerHTML = my_len
-                let route_on_map_element2 = document.getElementById('route_on_map_class2');
-                route_on_map_element2.innerHTML = my_len
-
                 draw_routes(data);
-
                 draw_table(data);
                 route_filter = null;
+                $.ajax({
+                  type: "GET",
+                  url: "/locations/get_user_route_count",
+                  success: function(count_data) {
+                     let point_count_element = document.getElementById('point_count_class');
+                     point_count_element.innerHTML = count_data["point_count"];
+                     let total_route_count_element = document.getElementById('total_route_count_element');
+                     total_route_count_element.innerHTML = count_data["route_count"];
+                  }
+                })
                }
              });
     });
