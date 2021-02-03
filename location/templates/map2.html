@@ -262,7 +262,7 @@ console.log("                    ___\n                _.-'   ```'--.._          
       }
       if (circle) {
         map.removeLayer(circle)
-        let radius = document.getElementById("radius").value = 0;
+        let radius = document.getElementById("radius");
         console.log("radius value: ", radius)
       }
     }
@@ -278,9 +278,21 @@ console.log("                    ___\n                _.-'   ```'--.._          
         '  </tr>' +
         '</thead>' +
         '<tbody>'
-      for (var i=0; i < data; i++) {
-        let row = data[i];
-
+      let i = 0;
+      console.log(data)
+      for (const [key, value] of Object.entries(data)) {
+        i++;
+        let username = value[0]['username'];
+        let route_id = value[0]['route_id'];
+        console.log('ARKADASLARRRRR ARKADASLAAAR')
+        $(table).find('tbody').append("<th scope='row'><td>" + i + "</td>");
+        $(table).find('tbody').append("<td>"+ username +"</td>");
+        $(table).find('tbody').append("<td>"+ route_id +"</td></th>");
+        // div.innerHTML += '<tr>' +
+        //     '<th scope="row">'+ i +'</th>' +
+        //     '<td>'+ user +'</td>' +
+        //     '<td>'+ route_id +'</td>' +
+        //   '</tr>'
       }
       div.innerHTML += "</tbody></table>"
     }

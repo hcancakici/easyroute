@@ -24,6 +24,6 @@ def create():
     data[data_len-1] = data[data_len-1].replace("[", "")
     data[0] = data[0].replace("[", "")
     index_add_counter += 1
-    with open('loc_data_{}.txt'.format(str(index_add_counter)), 'w') as filehandle:
+    with open('data/loc_data_{}.txt'.format(str(index_add_counter)), 'w') as filehandle:
         json.dump(data, filehandle)
     return {}
