@@ -65,7 +65,7 @@ class LocationViewSet(viewsets.ModelViewSet):
                 print(e)
                 friend_list = []
 
-            if friend_name in friend_list:
+            if self.request.user.username in friend_list:
                 friend_filter = True
 
         try:
