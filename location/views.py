@@ -88,7 +88,7 @@ class LocationViewSet(viewsets.ModelViewSet):
         except Exception as e:
             print(e)
             point = None
-        queryset = Location.objects.all()
+        queryset = Location.objects.filter(is_active=True)
         if self.request.user and self.request.user.is_superuser:
             # Get closest 2 routes
             if friend_name and user_filter:
@@ -100,16 +100,15 @@ class LocationViewSet(viewsets.ModelViewSet):
                 return_closest_two_routes = True
 
             if not return_closest_two_routes:
-                queryset = Location.objects.all()
                 if user_filter:
                     queryset = queryset.filter(username=user_filter)
         else:
             if friend_filter:
-                queryset = Location.objects.filter(username__in=[self.request.user.username, friend_name])
+                queryset = Location.objects.filter(is_active=True, username__in=[self.request.user.username, friend_name])
                 return_closest_two_routes = True
                 user_filter = self.request.user.username
             else:
-                queryset = Location.objects.filter(username=self.request.user.username)
+                queryset = Location.objects.filter(is_active=True, username=self.request.user.username)
 
         if from_date is not None:
             try:
@@ -128,7 +127,7 @@ class LocationViewSet(viewsets.ModelViewSet):
         if radius:
             if point:
                 queryset = queryset.filter(location__distance_lt=(point, Distance(km=radius)))
-                queryset = Location.objects.filter(route_id__in=set(queryset.values_list("route_id", flat=True)))
+                queryset = Location.objects.filter(is_active=True, route_id__in=set(queryset.values_list("route_id", flat=True)))
 
         if return_closest_two_routes:
             queryset = self.get_closest_routes(friend_name, user_filter, queryset)
@@ -150,9 +149,9 @@ class LocationViewSet(viewsets.ModelViewSet):
 
     def _get_friend_query(self, friend_name):
         if friend_name:
-            friend_queryset = Location.objects.filter(username=friend_name)
+            friend_queryset = Location.objects.filter(is_active=True, username=friend_name)
         else:
-            friend_queryset = Location.objects.filter(username__in=[])
+            friend_queryset = Location.objects.filter(username__in=[], is_active=True, )
         return friend_queryset
 
     def retrieve(self, request, *args, **kwargs):
@@ -195,7 +194,7 @@ class MapViewSet(generics.ListAPIView):
                     is_active=True,
                     username__isnull=False,
                     route_id__isnull=False).count()
-                route_list = list(set(Location.objects.values_list("route_id", flat=True)))
+                route_list = list(set(Location.objects.filter(is_active=True).values_list("route_id", flat=True)))
                 route_count = len(route_list)
                 user_list = User.objects.all()
             else:
@@ -322,7 +321,7 @@ def friend_list(request):
 
 
 class LocationBusyViewSet(viewsets.ModelViewSet):
-    queryset = Location.objects.all()
+    queryset = Location.objects.filter(is_active=True)
     authentication_classes = [SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
     ordering_fields = '__all__'
@@ -367,13 +366,13 @@ class LocationBusyViewSet(viewsets.ModelViewSet):
         if self.request.user and self.request.user.is_superuser:
             if friend_name:
                 friend_filter = True
-            queryset = Location.objects.all()
+            queryset = Location.objects.filter(is_active=True)
             if user_filter:
                 queryset = queryset.filter(username=user_filter)
             elif friend_filter:
                 queryset = queryset.filter(username=friend_filter)
         else:
-            queryset = Location.objects.filter(username=self.request.user.username)
+            queryset = Location.objects.filter(username=self.request.user.username, is_active=True)
 
         friend_query = self._get_friend_query(friend_name if friend_filter else False)
 
@@ -406,9 +405,9 @@ class LocationBusyViewSet(viewsets.ModelViewSet):
 
     def _get_friend_query(self, friend_name):
         if friend_name:
-            friend_queryset = Location.objects.filter(username=friend_name)
+            friend_queryset = Location.objects.filter(is_active=True, username=friend_name)
         else:
-            friend_queryset = Location.objects.filter(username__in=[])
+            friend_queryset = Location.objects.filter(is_active=True, username__in=[])
         return friend_queryset
 
     def get_serializer_class(self):
