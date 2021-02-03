@@ -15,7 +15,7 @@ urlpatterns = [
     path('', include(router.urls)),
     path('/map/', login_required(views.MapViewSet.as_view()), name="map-view"),
     path('/map-busy/', login_required(views.MapBusyViewSet.as_view()), name="busy-view"),
-    path('/signup/', csrf_exempt(views.signup), name='signup'),
+    path('/signup', csrf_exempt(views.signup), name='signup'),
     path('/friend_list', views.friend_list, name='friend-list'),
     path('/get_user_route_count', views.get_user_route_count, name='user-route-count'),
     path('/friend_list_detail', login_required(views.FriendListViewSet.as_view()), name='friend-list-detail'),
