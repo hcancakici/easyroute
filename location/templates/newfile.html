@@ -268,10 +268,11 @@
       var groups = JSON.parse('{{ groups|safe }}');
       var table_data = Array()
       var route_filter = null;
+      var radius_update = false;
       var colorArray = [
-        "#ff0000",
         "#00008b",
         "#800080",
+        "#ff0000",
         "#00ffff",
         "#000000",
         "#0000ff",
@@ -405,7 +406,7 @@
         if (table_data[route_locations[0].username] == undefined) {
             table_data[route_locations[0].username] = {"circleMarkers": [], "polylines": []}
         }
-        table_data[route_locations[0].username]["polylines"].push(polyline);
+        table_data[route_locations[0].username]["polylines"].push({"polyline": polyline, "bindpopup": bind_text});
         table_data[route_locations[0].username]["circleMarkers"].push(circleMarkerFirst);
         table_data[route_locations[0].username]["circleMarkers"].push(circleMarkerLast);
       }
@@ -442,12 +443,32 @@
 
     function focus_polyline(key) {
       let poly = table_data[key];
+      let our_poly = null;
       if (poly["circleMarkers"] != undefined) {
          clean_map()
+         if (circle) {
+             map.removeLayer(circle)
+             let radius = document.getElementById("radius").value
+             let circle_point = [LatestLat, LatestLong];
+             let circleOptions = {
+                color: 'red',
+                fillColor: '#f03',
+                fillOpacity: 0
+             }
+             circle = L.circle(circle_point, parseInt(radius)*100, circleOptions);
+             circle.addTo(map);
+           }
          polylines = new L.FeatureGroup();
          circleMarkers = new L.FeatureGroup();
          for (var i = 0; i < poly["polylines"].length; i++) {
-            poly["polylines"][i].addTo(polylines);
+            our_poly = poly["polylines"][i]["polyline"]
+            our_poly = our_poly.bindPopup(poly["polylines"][i]["bindpopup"])
+            our_poly.on('click', function () {
+             map.fitBounds(this.getBounds());
+             route_filter = this.options['route_id']
+           });
+            our_poly.addTo(polylines);
+
          }
          for (var i = 0; i < poly["circleMarkers"].length; i++) {
             poly["circleMarkers"][i].addTo(circleMarkers);
@@ -501,6 +522,7 @@
     }
 
     $("#radius").on("action input change", function(e) {
+      radius_update = true;
       let radius = document.getElementById("radius").value
       let meter = radius * 100;
       let km = meter / 1000;
@@ -551,6 +573,9 @@
         e.preventDefault(); // avoid to execute the actual submit of the form.
         var form = $(this);
         var data = form.serialize() + '&lat=' + LatestLat +'&lng=' + LatestLong + '&route_filter=' + route_filter
+        if (radius_update == false) {
+         data = data.replace("&radius=100", "");
+        }
         var url = form.attr('action');
         $.ajax({
                type: "GET",
@@ -559,7 +584,7 @@
 
                success: function(data)
                {
-
+                table_data = [];
                 clean_map(keep_point=marker);
                 if (circle){
                   circle.addTo(map)

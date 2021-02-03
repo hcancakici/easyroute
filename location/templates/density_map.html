@@ -227,11 +227,12 @@ console.log("                    ___\n                _.-'   ```'--.._          
       var user = "{{ user }}"
       var points = JSON.parse('{{ points|safe }}');
       points = points.points
+      var radius_update = false;
 
       var colorArray = [
-        "#ff0000",
         "#00008b",
         "#800080",
+        "#ff0000",
         "#00ffff",
         "#000000",
         "#0000ff",
@@ -352,6 +353,7 @@ console.log("                    ___\n                _.-'   ```'--.._          
     }
 
     $("#radius").on("action input change", function(e) {
+      radius_update = true;
       let radius = document.getElementById("radius").value
       let meter = radius * 100;
       let km = meter / 1000;
@@ -402,6 +404,9 @@ console.log("                    ___\n                _.-'   ```'--.._          
         e.preventDefault(); // avoid to execute the actual submit of the form.
         var form = $(this);
         var data = form.serialize() + '&lat=' + LatestLat +'&lng=' + LatestLong
+        if (radius_update == false) {
+         data = data.replace("&radius=100", "");
+        }
         var url = form.attr('action');
         $.ajax({
                type: "GET",

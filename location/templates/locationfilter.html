@@ -275,9 +275,9 @@ console.log("                    ___\n                _.-'   ```'--.._          
       var table_data = Array()
       var route_filter = null;
       var colorArray = [
-        "#ff0000",
         "#00008b",
         "#800080",
+        "#ff0000",
         "#00ffff",
         "#000000",
         "#0000ff",
@@ -412,7 +412,7 @@ console.log("                    ___\n                _.-'   ```'--.._          
         if (table_data[route_locations[0].username] == undefined) {
             table_data[route_locations[0].username] = {"circleMarkers": [], "polylines": []}
         }
-        table_data[route_locations[0].username]["polylines"].push(polyline);
+        table_data[route_locations[0].username]["polylines"].push({"polyline": polyline, "bindpopup": bind_text});
         table_data[route_locations[0].username]["circleMarkers"].push(circleMarkerFirst);
         table_data[route_locations[0].username]["circleMarkers"].push(circleMarkerLast);
       }
@@ -422,12 +422,20 @@ console.log("                    ___\n                _.-'   ```'--.._          
 
     function focus_polyline(key) {
       let poly = table_data[key];
+      let our_poly = null;
       if (poly["circleMarkers"] != undefined) {
          clean_map()
          polylines = new L.FeatureGroup();
          circleMarkers = new L.FeatureGroup();
          for (var i = 0; i < poly["polylines"].length; i++) {
-            poly["polylines"][i].addTo(polylines);
+            our_poly = poly["polylines"][i]["polyline"]
+            our_poly = our_poly.bindPopup(poly["polylines"][i]["bindpopup"])
+            our_poly.on('click', function () {
+             map.fitBounds(this.getBounds());
+             route_filter = this.options['route_id']
+           });
+            our_poly.addTo(polylines);
+            
          }
          for (var i = 0; i < poly["circleMarkers"].length; i++) {
             poly["circleMarkers"][i].addTo(circleMarkers);
@@ -607,6 +615,7 @@ console.log("                    ___\n                _.-'   ```'--.._          
                success: function(data)
                {
 
+                table_data = [];
                 clean_map(keep_point=marker);
                 clean_table();
                 let my_len = Object.keys(data).length;
