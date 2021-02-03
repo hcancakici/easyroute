@@ -274,8 +274,6 @@ console.log("                    ___\n                _.-'   ```'--.._          
       var table_data = Array()
       var route_filter = null;
       var colorArray = [
-        "#ffd700",
-        "#ffc0cb",        
         "#ff0000",
         "#00008b",
         "#800080",
@@ -311,7 +309,9 @@ console.log("                    ___\n                _.-'   ```'--.._          
         "#ffa500",
         "#800080",
         "#c0c0c0",
-        "#ffff00"];
+        "#ffff00"
+      ];
+
       var LatestLat = null;
       var LatestLong = null;
       var marker;
@@ -340,10 +340,25 @@ console.log("                    ___\n                _.-'   ```'--.._          
       let color_array_index = 0 
       polylines = new L.FeatureGroup();
       circleMarkers = new L.FeatureGroup()
-      arealines = new L.FeatureGroup()
-      var polyline = null
+      var polyline = null;
+      let user_color_list = [];
+      let c_color = colorArray[color_array_index];
+      let c_username = undefined;
+
       for (const [key, value] of Object.entries(locations)) {
         route_locations = value;
+        if (is_superuser) {
+         c_username = route_locations[0].username;
+         if (c_username in user_color_list) {
+            c_color = colorArray[user_color_list[c_username]];
+         } else {
+            user_color_list[c_username] = color_array_index;
+            c_color = colorArray[user_color_list[c_username]];
+            color_array_index++;
+            color_array_index = color_array_index % (colorArray.length-1)
+
+         }
+        }
         let latlngs = Array();
         let i = 1;
 
@@ -352,8 +367,8 @@ console.log("                    ___\n                _.-'   ```'--.._          
         let long = route_locations[0]["longitude"];
         let circleMarkerFirst = L.circleMarker([lat, long], {
             "radius": 4,
-            "fillColor": colorArray[color_array_index],
-            "color": colorArray[color_array_index],
+            "fillColor": c_color,
+            "color": c_color,
             "weight": 2,
             "opacity": 0.7,
           })
@@ -371,8 +386,8 @@ console.log("                    ___\n                _.-'   ```'--.._          
         long = route_locations[route_locations.length-1]["longitude"];
         let circleMarkerLast = L.circleMarker([lat, long], {
             "radius": 5,
-            "fillColor": colorArray[color_array_index],
-            "color": colorArray[color_array_index],
+            "fillColor": c_color,
+            "color": c_color,
             "weight": 6,
             "opacity": 1,
           })
@@ -385,14 +400,13 @@ console.log("                    ___\n                _.-'   ```'--.._          
          bind_text = route_locations[0].username + ": " + bind_text;
         }
 
-        polyline = L.polyline(latlngs, {route_id:route_locations[0].route_id, color: colorArray[color_array_index]}).bindPopup(bind_text);
+        polyline = L.polyline(latlngs, {opacity:2, weight:4,route_id:route_locations[0].route_id, color: c_color}).bindPopup(bind_text);
         polyline.on('click', function () {
           map.fitBounds(this.getBounds());
           route_filter = this.options['route_id']
         });
 
         polyline.addTo(polylines)
-        color_array_index++;
         table_data[route_locations[0].route_id] = polyline;
         if (table_data[route_locations[0].username] == undefined) {
             table_data[route_locations[0].username] = {"circleMarkers": [], "polylines": []}
@@ -403,28 +417,6 @@ console.log("                    ___\n                _.-'   ```'--.._          
       }
       polylines.addTo(map)
       map.fitBounds(polylines.getBounds())
-    }
-    let circle = null
-
-    function clean_map(keep_point) {
-      map.eachLayer(function (layer) {
-          if (layer instanceof L.Marker) {
-            map.removeLayer(layer);
-          }
-      });
-      if (keep_point) {
-          marker = new L.Marker([LatestLat, LatestLong]);
-          map.addLayer(marker);
-      }
-      if (polylines) {
-        map.removeLayer(polylines);
-      }
-      if (circleMarkers) {
-        map.removeLayer(circleMarkers);
-      }
-      if (arealines) {
-        map.removeLayer(arealines);
-      }
     }
 
     function focus_polyline(key) {
@@ -459,6 +451,8 @@ console.log("                    ___\n                _.-'   ```'--.._          
         '    <th scope="col">#</th>' +
         '    <th scope="col">User</th>' +
         '    <th scope="col">Route</th>' +
+        '    <th scope="col">Start Date</th>' +
+        '    <th scope="col">End Date</th>' +
         '  </tr>' +
         '</thead>' +
         '<tbody>'
@@ -470,20 +464,19 @@ console.log("                    ___\n                _.-'   ```'--.._          
         let route_id = value[0]['route_id'];
         let username_html = '"' + username + '"';
         let route_id_html = '"' + route_id + '"';
+        let location_date = value[0]['location_date'].substring(0, 16).replace("T", " ").replace("-", "/").replace("-", "/");
+        let last_location_date = value[value.length-1]['location_date'].substring(0, 16).replace("T", " ").replace("-", "/").replace("-", "/");
 
-        table_rows += "<tr><th scope='row' class='fw-600'>" + i + "</th>"+" <td><a href='javascript:void(0);' onclick='focus_polyline("+ username_html + ");'>"+ username +"</a></td>"+"<td><a href='javascript:void(0);' onclick='focus_polyline("+ route_id_html + ");'>"+ route_id +"</a></td></tr>";
-        // div.innerHTML += '<tr>' +
-        //     '<th scope="row">'+ i +'</th>' +
-        //     '<td>'+ user +'</td>' +
-        //     '<td>'+ route_id +'</td>' +
-        //   '</tr>'
+        location_date = location_date + " - " + last_location_date;
+        table_rows += "<tr><th scope='row' class='fw-600'>" + i + "</th>"+" <td><a href='javascript:void(0);' onclick='focus_polyline("+ username_html + ");'>"+ username +"</a></td>"+"<td><a href='javascript:void(0);' onclick='focus_polyline("+ route_id_html + ");'>"+ route_id +"</a></td><td>" + location_date + "</td><td>" + last_location_date + "</td></tr>";
       }
       $(table).find('tbody').append(table_rows);
       div.innerHTML += "</tbody></table>"
     }
 
     function clean_table() {
-      var Parent = document.getElementById("table-div").innetHTML = "";
+      let table_div = document.getElementById("table-div");
+      table_div.innerHTML = "";
 
     }
 
@@ -514,6 +507,7 @@ console.log("                    ___\n                _.-'   ```'--.._          
     var marker4 = null;
     var marker_list = [];
    var markerMarkers = new L.FeatureGroup();
+   var arealines = new L.FeatureGroup();
 
     map.on('click', function(e) {
         route_filter = null;
@@ -589,20 +583,25 @@ console.log("                    ___\n                _.-'   ```'--.._          
                {
 
                 clean_map(keep_point=marker);
-                clean_table()
-                console.log(data);
+                clean_table();
                 let my_len = Object.keys(data).length;
-                let point_count_element = document.getElementById('point_count_class');
-                point_count_element.innerHTML = my_len * 137;
                 let route_on_map_element = document.getElementById('route_on_map_class');
                 route_on_map_element.innerHTML = my_len
-                let route_on_map_element2 = document.getElementById('route_on_map_class2');
-                route_on_map_element2.innerHTML = my_len
-
-                draw_routes(data);
-
-                draw_table(data);
+                if (my_len > 0) {
+                   draw_routes(data);
+                   draw_table(data);
+                }
                 route_filter = null;
+                $.ajax({
+                  type: "GET",
+                  url: "/locations/get_user_route_count",
+                  success: function(count_data) {
+                     let point_count_element = document.getElementById('point_count_class');
+                     point_count_element.innerHTML = count_data["point_count"];
+                     let total_route_count_element = document.getElementById('total_route_count_element');
+                     total_route_count_element.innerHTML = count_data["route_count"];
+                  }
+                })
                }
              });
     });
