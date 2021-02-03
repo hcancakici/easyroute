@@ -91,33 +91,32 @@
                      <div class="masonry-sizer col-md-6"></div>
                         <div class="masonry-item w-100">
                            <div class="row gap-20">
-                              <div class="col-md-4">
+                              <div class="col-md-3">
                                  <div class="layers bd bgc-white p-20">
-                                    {% if user.is_superuser %}
-                                       <div class="layer w-100 mB-10">
-                                          <h6 class="lh-1">En Yoğun Saat</h6>
+                                    <div class="layer w-100 mB-10">
+                                       <h6 class="lh-1">Username</h6>
+                                    </div>
+                                    <div class="layer w-100">
+                                       <div class="peers ai-sb fxw-nw">
+                                          <div class="peer"><span class="d-ib lh-0 va-m fw-600 bdrs-10em pX-15 pY-15 bgc-green-50 c-green-500">{{ user.username }}</span></div>
                                        </div>
-                                       <div class="layer w-100">
-                                          <div class="peers ai-sb fxw-nw">
-                                             <div class="peer peer-greed"><span id="sparklinedash"></span></div>
-                                             <div class="peer"><span id="date_range_class" class="date_range_class d-ib lh-0 va-m fw-600 bdrs-10em pX-15 pY-15 bgc-green-50 c-green-500"></span></div>
-                                          </div>
-                                       </div>
-                                    {% else %}
-                                       <div class="layer w-100 mB-10">
-                                          <h6 class="lh-1">Username</h6>
-                                       </div>
-                                       <div class="layer w-100">
-                                          <div class="peers ai-sb fxw-nw">
-                                             <div class="peer"><span class="d-ib lh-0 va-m fw-600 bdrs-10em pX-15 pY-15 bgc-green-50 c-green-500">{{ user.username }}</span></div>
-                                          </div>
-                                       </div>
-
-                                    {% endif %}
-
+                                    </div>
                                  </div>
                               </div>
-                              <div class="col-md-4">
+                              <div class="col-md-3">
+                                 <div class="layers bd bgc-white p-20">
+                                    <div class="layer w-100 mB-10">
+                                       <h6 class="lh-1">En Yoğun Saat</h6>
+                                    </div>
+                                    <div class="layer w-100">
+                                       <div class="peers ai-sb fxw-nw">
+                                          <div class="peer peer-greed"><span id="sparklinedash"></span></div>
+                                          <div class="peer"><span id="date_range_class" class="date_range_class d-ib lh-0 va-m fw-600 bdrs-10em pX-15 pY-15 bgc-green-50 c-green-500"></span></div>
+                                       </div>
+                                    </div>
+                                 </div>
+                              </div>
+                              <div class="col-md-3">
                                  <div class="layers bd bgc-white p-20">
                                     <div class="layer w-100 mB-10">
                                        <h6 class="lh-1">En Yoğun Saat Lokasyon Sayısı</h6>
@@ -130,7 +129,7 @@
                                     </div>
                                  </div>
                               </div>
-                              <div class="col-md-4">
+                              <div class="col-md-3">
                                  <div class="layers bd bgc-white p-20">
                                     <div class="layer w-100 mB-10">
                                        <h6 class="lh-1">Toplam Lokasyon Sayısı</h6>
@@ -163,11 +162,10 @@
                                  <div class="mT-30">
                                     
                                     <div class="form-row">
-                                       <div class="form-group col-md-6"><label for="from_date">From Date</label><input name="from_date" type="datetime" class="form-control from_date" id="from_date" ></div>
-                                       <div class="form-group col-md-6"><label for="to_date">To Date</label><input name="to_date" type="datetime" class="form-control to_date" id="to_date" ></div>
+                                       <div class="form-group col-md-6"><label for="from_date">From Date</label><input required="true" name="from_date" type="datetime" class="form-control from_date" id="from_date" ></div>
+                                       <div class="form-group col-md-6"><label for="to_date">To Date</label><input required="true" name="to_date" type="datetime" class="form-control to_date" id="to_date" ></div>
                                     </div>
                                     
-                                    <div class="form-group"><label for="knn">KNN Search</label><input name="knn" type="text" class="form-control knn" id="knn"></div>
                                     <div class="form-group"><label for="radius">Radius</label><input name="radius" type="range" class="radius form-control"  max="200" min="0" id="radius"><input type="text" name="radius_text" class="radius_text form-control" id="radius_text" placeholder=""  disabled="disabled"></div>
                                     
                                     {% if user.is_superuser %}
@@ -181,7 +179,7 @@
                                              </select>
                                           </div>
                                     {% endif %}
-                                       <div class="form-group">
+                                       <!---<div class="form-group">
                                           <label for="User Search">Friend Filter</label>
                                           <select id="friend_name" name="friend_name" class="form-control">
                                             <option value="" selected>None</option>
@@ -189,7 +187,7 @@
                                               <option value="{{ temp_user }}">{{ temp_user }}</option>
                                             {% endfor %}
                                           </select>
-                                       </div>
+                                       </div>-->
                                        <div class="form-group">
                                           <button type="reset" class="btn btn-gray col-md-5" onclick="clean_map()">Clear</button>
                                           <button type="submit" class="btn btn-primary col-md-6">Search</button>
@@ -224,15 +222,12 @@
    <script src="{% static 'jquery.datetimepicker.js' %}"></script>
    <script>
 console.log("                    ___\n                _.-'   ```'--.._                 _____ ___ ___   ____  _____ __ __      ______  __ __    ___  \n              .'                `-._            / ___/|   |   | /    |/ ___/|  |  |    |      ||  |  |  /  _] \n             /                      `.         (   \\_ | _   _ ||  o  (   \\_ |  |  |    |      ||  |  | /  [_        \n            /                         `.        \\__  ||  \\_/  ||     |\\__  ||  _  |    |_|  |_||  _  ||    _]       \n           /                            `.      /  \\ ||   |   ||  _  |/  \\ ||  |  |      |  |  |  |  ||   [_        \n          :       (                       \\     \\    ||   |   ||  |  |\\    ||  |  |      |  |  |  |  ||     |       \n          |    (   \\_                  )   `.    \\___||___|___||__|__| \\___||__|__|      |__|  |__|__||_____|       \n          |     \\__/ '.               /  )  ;  \n          |   (___:    \\            _/__/   ;    ____   ____  ______  ____   ____   ____  ____      __  __ __  __ __ \n          :       | _  ;          .'   |__) :   |    \\ /    ||      ||    \\ |    | /    ||    \\    /  ]|  |  ||  |  |\n           :      |` \\ |         /     /   /    |  o  )  o  ||      ||  D  ) |  | |  o  ||  D  )  /  / |  |  ||  |  |\n            \\     |_  ;|        /`\\   /   /     |   _/|     ||_|  |_||    /  |  | |     ||    /  /  /  |  _  ||  ~  |\n             \\    ; ) :|       ;_  ; /   /      |  |  |  _  |  |  |  |    \\  |  | |  _  ||    \\ /   \\_ |  |  ||___, |\n              \\_  .-''-.       | ) :/   /       |  |  |  |  |  |  |  |  .  \\ |  | |  |  ||  .  \\\\     ||  |  ||     |\n             .-         `      .--.'   /        |__|  |__|__|  |__|  |__|\\_||____||__|__||__|\\_| \\____||__|__||____/ \n            :         _.----._     `  < \n            :       -'........'-       `.\n             `.        `''''`           ;\n               `'-.__                  ,'\n                     ``--.   :'-------'\n                         :   :\n                        .'   '.\n      \n      \n                                                                    ");
-      console.log("sa")
       var is_superuser = "{{ user.is_superuser }}";
       var user = "{{ user }}"
       var points = JSON.parse('{{ points|safe }}');
       points = points.points
 
       var colorArray = [
-        "#ffd700",
-        "#ffc0cb",        
         "#ff0000",
         "#00008b",
         "#800080",
@@ -268,7 +263,8 @@ console.log("                    ___\n                _.-'   ```'--.._          
         "#ffa500",
         "#800080",
         "#c0c0c0",
-        "#ffff00"];
+        "#ffff00"
+      ];
       var LatestLat = null;
       var LatestLong = null;
       var marker;
@@ -295,19 +291,34 @@ console.log("                    ___\n                _.-'   ```'--.._          
       let location;
       let color_array_index = 0 
       let _co_color = 0
+
+      let user_color_list = [];
+      let c_color = colorArray[color_array_index];
+      let c_username = undefined;
       circleMarkers = new L.FeatureGroup()
+
       for (i = 1; i < points.length-1; i++) {
-          color_array_index = getRandomInt(20);
-          co_color = colorArray[color_array_index];
           point = points[i];
+
+          if (is_superuser) {
+            c_username = point["username"];
+            if (c_username in user_color_list) {
+               c_color = colorArray[user_color_list[c_username]];
+            } else {
+               user_color_list[c_username] = color_array_index;
+               c_color = colorArray[user_color_list[c_username]];
+               color_array_index++;
+               color_array_index = color_array_index % (colorArray.length-1)
+            }
+           }
           lat = point["latitude"];
           long = point["longitude"];
          let circleMarkerFirst = L.circleMarker([lat, long], {
             "radius": 4,
-            "fillColor": co_color,
-            "color": co_color,
+            "fillColor": c_color,
+            "color": c_color,
             "weight": 2,
-            "opacity": 0.7,
+            "opacity": 0.6,
           }).bindPopup(point["username"] + ": " + point["route_id"])
           circleMarkerFirst.addTo(circleMarkers)
         }
@@ -323,7 +334,7 @@ console.log("                    ___\n                _.-'   ```'--.._          
             map.removeLayer(layer);
           }
       });
-      if (keep_point) {
+      if (keep_point && LatestLong != undefined && LatestLat != undefined) {
           marker = new L.Marker([LatestLat, LatestLong]);
           map.addLayer(marker);
       }
@@ -399,16 +410,18 @@ console.log("                    ___\n                _.-'   ```'--.._          
                success: function(data)
                {
                 clean_map(keep_point=marker);
+                if (circle) {
+                  circle.addTo(map);
+                }
                 let date_range = data['date_range'];
                 let point_data = data['data'];
-                point_data = JSON.parse(point_data);
-                 let date_range_element = document.getElementById('date_range_class');
-                 let total_point_class = document.getElementById('total_point_class');
-                 date_range_element.innerHTML = date_range["key"]
-                 total_point_class.innerHTML = date_range["count"]
-
-                console.log(date_range)
-                draw_routes(point_data["queryset"]);
+                let date_range_element = document.getElementById('date_range_class');
+                let total_point_class = document.getElementById('total_point_class');
+                date_range_element.innerHTML = date_range["key"]
+                total_point_class.innerHTML = date_range["count"]
+                if (point_data.length > 0) {
+                  draw_routes(point_data);
+                }
                }
              });
     });
