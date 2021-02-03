@@ -52,6 +52,14 @@
                   <li class="nav-item mT-30 active"><a class="sidebar-link" href="/locations/map/" default><span class="icon-holder"><i class="c-blue-500 ti-home"></i> </span><span class="title">Dashboard</span></a></li>
                   <li class="nav-item"><a class="sidebar-link" href="{% url 'friend-list-detail' %}"><span class="icon-holder"><i class="c-brown-500 ti-comment-alt"></i> </span><span class="title">Friends</span></a></li>
                   <li class="nav-item"><a class="sidebar-link" href="{% url 'busy-view' %}"><span class="icon-holder"><i class="c-brown-500 ti-map"></i> </span><span class="title">Density Map</span></a></li>
+                  <li class="nav-item"><a class="sidebar-link" href="{% url 'locationfilter-view' %}" default><span class="icon-holder"><i class="c-pink-500 ti-palette"></i> </span><span class="title">Area Select</span></a></li>
+                  <li class="nav-item dropdown">
+                     <a class="dropdown-toggle" href="javascript:void(0);"><span class="icon-holder"><i class="c-orange-500 ti-layout-list-thumb"></i> </span><span class="title">Tables</span> <span class="arrow"><i class="ti-angle-right"></i></span></a>
+                     <ul class="dropdown-menu">
+                        <li><a class="sidebar-link" href="basic-table.html">Basic Table</a></li>
+                        <li><a class="sidebar-link" href="datatable.html">Data Table</a></li>
+                     </ul>
+                  </li>
                   
                </ul>
             </div>

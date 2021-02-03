@@ -53,6 +53,7 @@
                   <li class="nav-item mT-30 active"><a class="sidebar-link" href="/locations/map/" default><span class="icon-holder"><i class="c-blue-500 ti-home"></i> </span><span class="title">Dashboard</span></a></li>
                   <li class="nav-item"><a class="sidebar-link" href="{% url 'friend-list-detail' %}"><span class="icon-holder"><i class="c-brown-500 ti-comment-alt"></i> </span><span class="title">Friends</span></a></li>
                   <li class="nav-item"><a class="sidebar-link" href="{% url 'busy-view' %}"><span class="icon-holder"><i class="c-brown-500 ti-map"></i> </span><span class="title">Density Map</span></a></li>
+                  <li class="nav-item"><a class="sidebar-link" href="{% url 'locationfilter-view' %}" default><span class="icon-holder"><i class="c-pink-500 ti-palette"></i> </span><span class="title">Area Select</span></a></li>
                   <li class="nav-item dropdown">
                      <a class="dropdown-toggle" href="javascript:void(0);"><span class="icon-holder"><i class="c-orange-500 ti-layout-list-thumb"></i> </span><span class="title">Tables</span> <span class="arrow"><i class="ti-angle-right"></i></span></a>
                      <ul class="dropdown-menu">
@@ -126,7 +127,7 @@
                                     <div class="layer w-100">
                                        <div class="peers ai-sb fxw-nw">
                                           <div class="peer peer-greed"><span id="sparklinedash2"></span></div>
-                                          <div class="peer"><span id="route_on_map_class2"class="route_on_map_class2 d-ib lh-0 va-m fw-600 bdrs-10em pX-15 pY-15 bgc-red-50 c-red-500">0</span></div>
+                                          <div class="peer"><span id="route_on_map_class"class="route_on_map_class d-ib lh-0 va-m fw-600 bdrs-10em pX-15 pY-15 bgc-red-50 c-red-500">0</span></div>
                                        </div>
                                     </div>
                                  </div>
@@ -139,7 +140,7 @@
                                     <div class="layer w-100">
                                        <div class="peers ai-sb fxw-nw">
                                           <div class="peer peer-greed"><span id="sparklinedash2"></span></div>
-                                          <div class="peer"><span id="route_on_map_class" class="route_on_map_class d-ib lh-0 va-m fw-600 bdrs-10em pX-15 pY-15 bgc-red-50 c-red-500">{{ route_count }}</span></div>
+                                          <div class="peer"><span id="total_route_count_element" class="total_route_count_element d-ib lh-0 va-m fw-600 bdrs-10em pX-15 pY-15 bgc-red-50 c-red-500">{{ route_count }}</span></div>
                                        </div>
                                     </div>
                                  </div>
@@ -166,15 +167,15 @@
                               <div class="peer bdL p-20 w-40p@lg+ w-100p@lg-">
                                
                               <h6 class="c-grey-900">Selected Point</h6>
-                              <form id="search-form" action="/locations">
+                              <form id="search-form" action="/locationfilter">
                                  <div class="mT-30">                                
                                     <div class="form-row">
-                                       <div class="form-group col-md-6"><label for="lat">C1(lat,long)</label><input type="text" class="form-control" disabled="" id="c1"></div>
-                                       <div class="form-group col-md-6"><label for="lng">C2(lat,long)</label><input type="text" class="form-control" disabled="" id="c2"></div>
+                                       <div class="form-group col-md-6"><label for="c1">C1(lat,long)</label><input name="c1" type="text" class="c1 form-control" disabled="" id="c1"></div>
+                                       <div class="form-group col-md-6"><label for="c2">C2(lat,long)</label><input name="c2" type="text" class="c2 form-control" disabled="" id="c2"></div>
                                     </div>
                                     <div class="form-row">
-                                       <div class="form-group col-md-6"><label for="lat">C3(lat, long)</label><input type="text" class="form-control" disabled="" id="c3"></div>
-                                       <div class="form-group col-md-6"><label for="lng">C4(lat, long)</label><input type="text" class="form-control" disabled="" id="c4"></div>
+                                       <div class="form-group col-md-6"><label for="c3">C3(lat, long)</label><input name="c3" type="text" class=" c3 form-control" disabled="" id="c3"></div>
+                                       <div class="form-group col-md-6"><label for="c4">C4(lat, long)</label><input name="c4" type="text" class="c4 form-control" disabled="" id="c4"></div>
                                     </div>
                                  </div>
                                  <h6 class="c-grey-900">Search Parameters</h6>
@@ -443,6 +444,27 @@ console.log("                    ___\n                _.-'   ```'--.._          
        
     }
 
+
+    function clean_map(keep_point) {
+      map.eachLayer(function (layer) {
+          if (layer instanceof L.Marker) {
+            map.removeLayer(layer);
+          }
+      });
+      // if (arealines) {
+      if (false) {
+         map.removeLayer(arealines);
+         arealines = new L.FeatureGroup();
+      }
+      if (polylines) {
+        map.removeLayer(polylines);
+      }
+      if (circleMarkers) {
+        map.removeLayer(circleMarkers);
+      }
+    }
+
+
     function draw_table(data, polyline_data) {
       var div = document.getElementById("table-div");
       div.innerHTML = "<table class='table' id='table'>" +
@@ -467,7 +489,6 @@ console.log("                    ___\n                _.-'   ```'--.._          
         let location_date = value[0]['location_date'].substring(0, 16).replace("T", " ").replace("-", "/").replace("-", "/");
         let last_location_date = value[value.length-1]['location_date'].substring(0, 16).replace("T", " ").replace("-", "/").replace("-", "/");
 
-        location_date = location_date + " - " + last_location_date;
         table_rows += "<tr><th scope='row' class='fw-600'>" + i + "</th>"+" <td><a href='javascript:void(0);' onclick='focus_polyline("+ username_html + ");'>"+ username +"</a></td>"+"<td><a href='javascript:void(0);' onclick='focus_polyline("+ route_id_html + ");'>"+ route_id +"</a></td><td>" + location_date + "</td><td>" + last_location_date + "</td></tr>";
       }
       $(table).find('tbody').append(table_rows);
@@ -572,7 +593,11 @@ console.log("                    ___\n                _.-'   ```'--.._          
     $("#search-form").submit(function(e) {
         e.preventDefault(); // avoid to execute the actual submit of the form.
         var form = $(this);
-        var data = form.serialize() + '&lat=' + LatestLat +'&lng=' + LatestLong + '&route_filter=' + route_filter
+        let c1_element = document.getElementById("c1").value;
+        let c2_element = document.getElementById("c2").value;
+        let c3_element = document.getElementById("c3").value;
+        let c4_element = document.getElementById("c4").value;
+        var data = form.serialize() + "&c1=" + c1_element + "&c2=" + c2_element + "&c3=" + c3_element + "&c4=" + c4_element;
         var url = form.attr('action');
         $.ajax({
                type: "GET",
@@ -598,6 +623,7 @@ console.log("                    ___\n                _.-'   ```'--.._          
                   success: function(count_data) {
                      let point_count_element = document.getElementById('point_count_class');
                      point_count_element.innerHTML = count_data["point_count"];
+                     console.log()
                      let total_route_count_element = document.getElementById('total_route_count_element');
                      total_route_count_element.innerHTML = count_data["route_count"];
                   }
