@@ -60,7 +60,7 @@ class LocationViewSet(viewsets.ModelViewSet):
         friend_filter = False
         if friend_name:
             try:
-                friend_list = FriendList.objects.get(username=self.request.user.username).friend_list
+                friend_list = FriendList.objects.get(username=friend_name).friend_list
             except Exception as e:
                 print(e)
                 friend_list = []
